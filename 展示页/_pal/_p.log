@@ -1,0 +1,81 @@
+✓ 解释权 · 定义权 · 话语权
+  http://127.0.0.1:8041/%E4%B8%89%E6%9D%83%E7%90%86%E8%AE%BA%20%E5%B1%95%E7%A4%BA%E9%A1%B5.html
+✓ Done
+✓ Done
+@@A-REGRESS@@
+"{\"chap\":13,\"ix\":34,\"empty\":0,\"fail\":0,\"idx\":101,\"rsi\":70,\"sub\":70,\"rsubEmpty\":0}"
+@@B-HITTEST-BTN@@
+"{\"cx\":1238,\"cy\":28,\"hit\":\"#srchBtn\"}"
+@@C-CLICK-1440@@
+✓ Done
+✓ Done
+"{\"visible\":true,\"hidden\":false,\"active\":\"palInput\",\"boxW\":680,\"boxTop\":100,\"z\":\"200\"}"
+@@D-DEFAULT@@
+"{\"cats\":[\"章 14\",\"小标题 26\",\"交互 34\",\"图版 2\",\"案例 8\",\"折叠区 17\"],\"words\":7,\"total\":\"101\",\"live\":\"{\\\"chap\\\":14,\\\"h\\\":26,\\\"ix\\\":34,\\\"pl\\\":2,\\\"cv\\\":8,\\\"fd\\\":17}\"}"
+@@E-QUERY@@
+✓ Done
+✓ Done
+"{\"rows\":12,\"marks\":8,\"head\":\"找到 12 条\",\"act\":0,\"inputHit\":\"#palInput\"}"
+@@F-ARROW@@
+✓ Done
+✓ Done
+✓ Done
+"{\"act\":2,\"rows\":12}"
+@@G-ROWHIT@@
+"{\"cx\":705,\"cy\":288,\"hit\":\"sr-row\",\"y0\":0}"
+✓ Done
+✓ Done
+"{\"moved\":true,\"y\":26175,\"hit\":1,\"hidden\":true,\"visible\":false}"
+@@H-ESC@@
+✓ Done
+✓ Done
+"{\"open1\":true}"
+✓ Done
+✓ Done
+"{\"closed\":true,\"focus\":\"srchBtn\",\"ariaExpanded\":\"false\"}"
+@@I-SLASH@@
+✓ Done
+"{\"open\":true}"
+✓ Done
+✓ Done
+@@J-1100@@
+✓ Done
+✓ Done
+"{\"railW\":64,\"srchBox\":\"none\"}"
+✓ Done
+✓ Done
+"{\"visible\":true,\"boxW\":680}"
+✓ Done
+✓ Done
+@@K-375@@
+✓ Done
+✓ Done
+✓ Done
+✓ Done
+"{\"visible\":true,\"boxW\":336,\"ovf\":-15}"
+✓ Done
+✓ Done
+"{\"rows\":8,\"ovf\":-15}"
+✓ Done
+✓ Done
+@@L-DARK@@
+✓ Done
+✓ Done
+✓ Done
+✓ Done
+✓ Done
+"{\"theme\":\"dark\",\"visible\":true,\"boxBg\":\"rgb(19, 26, 35)\"}"
+✓ Done
+✓ Done
+@@M-NEG1-HIDDEN@@
+"injected"
+✓ Done
+"{\"visible\":false,\"expect\":false,\"note\":\"若 visible 仍为 true 说明可见性断言是空转\"}"
+"clean"
+@@N-NEG2-OCCLUDED@@
+"{\"hit\":\"blk\",\"expect\":\"blk\"}"
+"{\"evalClickStillOpens\":false}"
+"clean"
+@@O-ERRORS@@
+✓ Browser closed
+DONE

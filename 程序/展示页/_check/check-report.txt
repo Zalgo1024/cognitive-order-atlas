@@ -1,0 +1,33 @@
+script blocks: 2
+node --check -> rc=0
+ids defined in HTML: 38
+ids referenced by JS: 9
+MISSING ids: none
+ix blocks in HTML: 16
+SPECS keys: 16
+data-id without SPECS: none
+SPECS never used: none
+ix types: {'chain': 4, 'picker': 4, 'closure': 1, 'slider': 3, 'sim': 2, 'stepper': 1, 'matrix': 1}
+  selector used: .chap
+  selector used: .rail a
+  selector used: a
+  selector used: .rv
+  selector used: .ix-note
+  selector used: .ch-node
+  selector used: .st-tag
+  selector used: .st-title
+  selector used: .st-foot
+  selector used: [data-f="can"]
+  selector used: [data-f="stuck"]
+  selector used: [data-f="state"]
+  selector used: .sl-ticks span
+  selector used: .sm-step
+  selector used: i
+  selector used: .ix
+  selector used: .ix-body
+unclosed tags: none
+tag errors: none
+inline handlers: ['toggleFold']
+MISSING handlers: none
+total chars: 99890
+total lines: 2307

@@ -1,0 +1,1982 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三权理论 — 解释权 · 定义权 · 话语权</title>
+<style>
+/* ============================================================
+   设计系统 · 「认知制图」
+   深石墨底 + 三色语义码 + 发丝线 + 等宽编号
+   定义权 = 靛  解释权 = 琥珀  话语权 = 青  反噬 = 危险红
+   ============================================================ */
+:root{
+  --bg:        #0a0d12;
+  --bg-2:      #0e1319;
+  --surface:   #131a23;
+  --surface-2: #19222e;
+  --surface-3: #1f2a38;
+  --line:      #222c3a;
+  --line-hi:   #3b4c62;
+  --ink:       #e9eef7;
+  --ink-2:     #a2b0c6;
+  --ink-3:     #6b7b93;
+  --ink-4:     #4a5769;
+
+  --def:       #6ea8fe;
+  --def-dim:   rgba(110,168,254,.13);
+  --exp:       #e0a458;
+  --exp-dim:   rgba(224,164,88,.13);
+  --dis:       #45d9b0;
+  --dis-dim:   rgba(69,217,176,.13);
+  --danger:    #ff5c6c;
+  --danger-dim:rgba(255,92,108,.12);
+
+  --mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, "Liberation Mono", monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Microsoft YaHei",
+          "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+  --maxw: 940px;
+}
+*,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+body{
+  font-family:var(--sans);
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.75;
+  overflow-x:hidden;
+  font-size:16px;
+  -webkit-font-smoothing:antialiased;
+}
+/* 底纹：极淡技术网格 */
+body::before{
+  content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(110,168,254,0.030) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(110,168,254,0.030) 1px, transparent 1px);
+  background-size:64px 64px;
+  mask-image:radial-gradient(ellipse 120% 80% at 50% 0%, #000 0%, transparent 78%);
+  -webkit-mask-image:radial-gradient(ellipse 120% 80% at 50% 0%, #000 0%, transparent 78%);
+}
+.page{ display:none; position:relative; z-index:1; }
+.page.active{ display:block; }
+a{ color:inherit; text-decoration:none; }
+button{ font:inherit; color:inherit; background:none; border:none; cursor:pointer; }
+.mono{ font-family:var(--mono); font-variant-numeric:tabular-nums; }
+
+/* ===== 导航 ===== */
+.nav{
+  position:fixed; top:0; left:0; right:0; z-index:120;
+  background:rgba(10,13,18,0.82);
+  backdrop-filter:blur(14px) saturate(1.4);
+  -webkit-backdrop-filter:blur(14px) saturate(1.4);
+  border-bottom:1px solid var(--line);
+  height:56px; display:flex; align-items:stretch; justify-content:center;
+  gap:2px; padding:0 18px;
+}
+.nav button{
+  display:flex; align-items:center; gap:9px;
+  padding:0 18px; font-size:13px; color:var(--ink-3);
+  border-bottom:2px solid transparent; transition:color .22s, border-color .22s;
+  white-space:nowrap;
+}
+.nav button .n{ font-family:var(--mono); font-size:11px; opacity:.75; }
+.nav button:hover{ color:var(--ink-2); }
+.nav button.on{ color:var(--ink); border-bottom-color:var(--def); }
+.nav button.on .n{ color:var(--def); opacity:1; }
+
+/* ===== 版心与分节 ===== */
+.wrap{ max-width:var(--maxw); margin:0 auto; padding:0 28px; }
+section{ position:relative; }
+.band{ padding:96px 0; }
+.band + .band{ border-top:1px solid var(--line); }
+.sec-kicker{
+  display:flex; align-items:center; gap:12px;
+  font-family:var(--mono); font-size:11px; letter-spacing:.22em;
+  color:var(--ink-3); text-transform:uppercase; margin-bottom:18px;
+}
+.sec-kicker::after{ content:""; flex:1; height:1px; background:var(--line); order:9; }
+.sec-kicker b{ color:var(--ink-4); font-weight:400; }
+.sec-title{
+  font-size:clamp(24px,3.2vw,34px); font-weight:700;
+  letter-spacing:.01em; line-height:1.35; color:var(--ink); margin-bottom:16px;
+}
+.sec-lead{ font-size:15px; color:var(--ink-2); max-width:720px; line-height:1.85; }
+.sec-lead em{ font-style:normal; color:var(--ink); border-bottom:1px solid var(--line-hi); padding-bottom:1px; }
+.sec-lead b{ color:var(--ink); font-weight:600; }
+
+/* ===== 滚动显现 ===== */
+.rv{ opacity:0; transform:translateY(22px); transition:opacity .7s cubic-bezier(.22,.7,.3,1), transform .7s cubic-bezier(.22,.7,.3,1); }
+.rv.on{ opacity:1; transform:none; }
+.rv-1{ transition-delay:.06s } .rv-2{ transition-delay:.12s } .rv-3{ transition-delay:.18s } .rv-4{ transition-delay:.24s }
+
+/* ===== Hero ===== */
+.hero{
+  min-height:100svh; display:flex; flex-direction:column; justify-content:center;
+  padding:132px 0 72px; position:relative;
+}
+.hero::after{
+  content:""; position:absolute; left:50%; top:14%; width:min(1100px,150%);
+  height:640px; transform:translateX(-50%); pointer-events:none; z-index:-1;
+  background:radial-gradient(ellipse at 50% 40%, rgba(110,168,254,.13), transparent 62%),
+             radial-gradient(ellipse at 18% 72%, rgba(224,164,88,.09), transparent 60%),
+             radial-gradient(ellipse at 84% 66%, rgba(69,217,176,.09), transparent 60%);
+}
+.eyebrow{
+  display:flex; align-items:center; gap:14px; margin-bottom:30px;
+  font-family:var(--mono); font-size:11px; letter-spacing:.3em; color:var(--ink-3);
+}
+.eyebrow::before{ content:""; width:34px; height:1px; background:var(--line-hi); }
+h1.hero-title{
+  font-size:clamp(52px,10vw,104px); font-weight:800; letter-spacing:.06em;
+  line-height:1.02; margin-bottom:22px;
+  background:linear-gradient(96deg, var(--def) 0%, var(--ink) 42%, var(--exp) 72%, var(--dis) 100%);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+}
+.hero-sub{
+  font-family:var(--mono); font-size:clamp(12px,1.6vw,15px); letter-spacing:.42em;
+  color:var(--ink-2); margin-bottom:34px;
+}
+.hero-lead{ font-size:clamp(15px,1.8vw,17px); color:var(--ink-2); max-width:660px; line-height:1.95; }
+.hero-lead b{ color:var(--ink); font-weight:600; }
+
+/* 三卡 */
+.triad{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:56px; }
+.tcard{
+  position:relative; text-align:left; padding:26px 22px 24px;
+  background:linear-gradient(168deg, var(--surface) 0%, var(--bg-2) 100%);
+  border:1px solid var(--line); border-radius:4px;
+  transition:transform .3s cubic-bezier(.2,.7,.3,1), border-color .3s, box-shadow .3s;
+  overflow:hidden;
+}
+.tcard::before{
+  content:""; position:absolute; top:0; left:0; right:0; height:2px;
+  background:var(--c); opacity:.55; transition:opacity .3s;
+}
+.tcard::after{
+  content:""; position:absolute; inset:0; pointer-events:none; opacity:0;
+  transition:opacity .35s; background:radial-gradient(120% 80% at 50% 0%, var(--c-dim), transparent 70%);
+}
+.tcard:hover{ transform:translateY(-5px); border-color:var(--c); box-shadow:0 18px 40px -22px var(--c); }
+.tcard:hover::before{ opacity:1; }
+.tcard:hover::after{ opacity:1; }
+.tcard .tno{ font-family:var(--mono); font-size:11px; letter-spacing:.18em; color:var(--c); margin-bottom:14px; display:block; }
+.tcard .tname{ font-size:24px; font-weight:700; letter-spacing:.04em; margin-bottom:10px; }
+.tcard .tq{ font-size:12.5px; color:var(--ink-3); margin-bottom:14px; font-family:var(--mono); letter-spacing:.04em; }
+.tcard .tdesc{ font-size:13.5px; color:var(--ink-2); line-height:1.75; }
+.tcard .tkey{ margin-top:16px; padding-top:14px; border-top:1px dashed var(--line); font-size:12.5px; color:var(--ink-3); }
+.hero-note{
+  margin-top:34px; font-size:13.5px; color:var(--ink-3); display:flex; gap:12px; align-items:flex-start;
+}
+.hero-note .bar{ flex:0 0 2px; align-self:stretch; background:linear-gradient(var(--def),var(--dis)); border-radius:2px; }
+.hero-note b{ color:var(--ink); }
+
+/* ===== 命题带 ===== */
+.claims{ display:flex; flex-direction:column; gap:0; border-top:1px solid var(--line); margin-top:38px; }
+.claim{
+  display:grid; grid-template-columns:200px 1fr; gap:28px; align-items:baseline;
+  padding:30px 0; border-bottom:1px solid var(--line);
+  transition:background .3s, padding-left .3s;
+}
+.claim:hover{ background:linear-gradient(90deg, var(--surface), transparent 70%); padding-left:16px; }
+.claim .cl{ display:flex; align-items:center; gap:12px; font-family:var(--mono); font-size:12px; letter-spacing:.16em; color:var(--c); }
+.claim .cl .dot{ width:7px; height:7px; border-radius:50%; background:var(--c); box-shadow:0 0 12px var(--c); flex:0 0 auto; }
+.claim .ct{ font-size:clamp(17px,2.2vw,21px); font-weight:600; color:var(--ink); line-height:1.6; }
+.claim .ct small{ display:block; font-size:13.5px; font-weight:400; color:var(--ink-3); margin-top:8px; line-height:1.8; }
+.statement{
+  margin-top:56px; padding:34px 30px; border:1px solid var(--line); border-left:2px solid var(--def);
+  background:linear-gradient(100deg, var(--surface), transparent);
+  font-size:clamp(16px,2vw,19px); color:var(--ink); line-height:1.9; letter-spacing:.01em;
+}
+.statement span{ display:block; font-size:13px; color:var(--ink-3); margin-top:14px; font-family:var(--mono); letter-spacing:.08em; }
+
+/* ===== 图版（canvas） ===== */
+.plate{
+  margin-top:34px; border:1px solid var(--line); border-radius:4px; overflow:hidden;
+  background:linear-gradient(180deg, var(--bg-2), #0b0f15);
+}
+.plate-bar{
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:12px 18px; border-bottom:1px solid var(--line);
+  font-family:var(--mono); font-size:11px; letter-spacing:.14em; color:var(--ink-4); text-transform:uppercase;
+}
+.plate-bar .l{ display:flex; align-items:center; gap:10px; }
+.plate-bar .l i{ width:8px; height:8px; border-radius:50%; background:var(--def); box-shadow:0 0 10px var(--def); }
+canvas#atlas{ display:block; width:100%; height:auto; cursor:pointer; touch-action:manipulation; }
+.plate-cap{
+  padding:16px 18px; border-top:1px solid var(--line);
+  font-size:12.5px; color:var(--ink-3); line-height:1.8;
+  display:flex; flex-wrap:wrap; gap:8px 22px;
+}
+.plate-cap span{ display:flex; align-items:center; gap:7px; }
+.plate-cap i{ width:9px; height:9px; border-radius:50%; display:inline-block; flex:0 0 auto; }
+
+/* ===== 要点卡 ===== */
+.cards{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:32px; }
+.card{
+  padding:20px 20px 18px; background:var(--surface); border:1px solid var(--line);
+  border-radius:4px; transition:border-color .3s, background .3s, transform .3s;
+}
+.card:hover{ border-color:var(--line-hi); background:var(--surface-2); transform:translateY(-2px); }
+.card h4{ font-size:14.5px; font-weight:650; margin-bottom:8px; color:var(--ink); display:flex; align-items:center; gap:9px; }
+.card h4::before{ content:""; width:5px; height:5px; border-radius:1px; background:var(--c,var(--def)); flex:0 0 auto; }
+.card p{ font-size:13.5px; color:var(--ink-2); line-height:1.8; }
+.card p b{ color:var(--ink); font-weight:600; }
+
+/* ===== 交互组件外壳 ===== */
+.widget{
+  margin-top:22px; padding:22px; border:1px solid var(--line); border-radius:4px;
+  background:linear-gradient(165deg, var(--surface), var(--bg-2));
+}
+.w-head{ display:flex; flex-wrap:wrap; align-items:baseline; gap:12px; margin-bottom:18px; }
+.w-label{
+  font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--c,var(--def)); display:flex; align-items:center; gap:9px;
+}
+.w-label::before{ content:"◆"; font-size:9px; }
+.w-hint{ font-size:12.5px; color:var(--ink-3); }
+.w-note{
+  margin-top:16px; padding-top:14px; border-top:1px dashed var(--line);
+  font-size:13px; color:var(--ink-3); line-height:1.8;
+}
+.w-note b{ color:var(--ink-2); font-weight:600; }
+
+/* 定义闭合 */
+.chips{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; }
+.chip{
+  padding:7px 15px; border:1px solid var(--line-hi); border-radius:999px;
+  font-size:13px; color:var(--ink-2); transition:.25s;
+}
+.chip:hover{ border-color:var(--def); color:var(--ink); }
+.chip.on{ background:var(--def-dim); border-color:var(--def); color:var(--def); }
+.badge{
+  display:inline-flex; align-items:center; gap:10px; padding:9px 16px;
+  border:1px solid var(--def); border-radius:3px; background:var(--def-dim);
+  font-size:13.5px; color:var(--ink); margin-bottom:16px;
+}
+.badge b{ color:var(--def); font-weight:650; }
+.rows{ display:flex; flex-direction:column; gap:8px; }
+.row{
+  display:grid; grid-template-columns:150px 1fr; gap:16px; align-items:center;
+  padding:12px 15px; background:var(--bg-2); border:1px solid var(--line); border-radius:3px;
+  opacity:0; transform:translateX(-10px); animation:rowIn .45s cubic-bezier(.2,.8,.3,1) forwards;
+}
+@keyframes rowIn{ to{ opacity:1; transform:none; } }
+.row .rk{ font-size:13px; color:var(--ink-2); }
+.row .rv2{ font-size:13px; color:var(--ink-3); }
+.row .rv2 em{ font-style:normal; color:var(--def); }
+.row .rv2::before{ content:"→ "; color:var(--ink-4); }
+
+/* 滑块 */
+.track-wrap{ margin-bottom:22px; }
+input[type=range]{
+  -webkit-appearance:none; appearance:none; width:100%; height:2px; background:var(--line-hi);
+  outline:none; border-radius:2px; margin:14px 0 10px; cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; width:18px; height:18px; border-radius:50%;
+  background:var(--exp); border:3px solid var(--bg); box-shadow:0 0 0 1px var(--exp), 0 0 18px var(--exp);
+}
+input[type=range]::-moz-range-thumb{
+  width:12px; height:12px; border-radius:50%; background:var(--exp);
+  border:3px solid var(--bg); box-shadow:0 0 0 1px var(--exp), 0 0 18px var(--exp);
+}
+input[type=range].danger{ background:var(--line-hi); }
+input[type=range].danger::-webkit-slider-thumb{ background:var(--danger); box-shadow:0 0 0 1px var(--danger), 0 0 18px var(--danger); }
+input[type=range].danger::-moz-range-thumb{ background:var(--danger); box-shadow:0 0 0 1px var(--danger), 0 0 18px var(--danger); }
+.ticks{ display:flex; justify-content:space-between; gap:10px; }
+.ticks span{ font-size:12px; color:var(--ink-4); font-family:var(--mono); flex:1; }
+.ticks span:nth-child(2){ text-align:center; } .ticks span:nth-child(3){ text-align:right; }
+.ticks span.hi{ color:var(--exp); }
+
+/* 因果链 */
+.chain{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:20px; }
+.node{
+  padding:9px 13px; border:1px solid var(--line); border-radius:3px; font-size:12.5px;
+  color:var(--ink-4); background:var(--bg-2); transition:.35s; position:relative;
+}
+.node.cause{ color:var(--ink); border-color:var(--exp); background:var(--exp-dim); }
+.node.effect{ color:var(--exp); border-color:var(--exp); background:transparent; font-weight:600; }
+.node.bg{ opacity:.45; border-style:dashed; }
+.chain .sep{ color:var(--ink-4); font-size:12px; }
+.readout{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.ro{ padding:14px 16px; background:var(--bg-2); border:1px solid var(--line); border-radius:3px; border-left:2px solid var(--c); }
+.ro .k{ font-family:var(--mono); font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-4); margin-bottom:6px; }
+.ro .v{ font-size:15px; font-weight:600; color:var(--ink); }
+
+/* 传播链 */
+.pipe{ display:flex; flex-wrap:wrap; align-items:stretch; gap:6px; margin-bottom:20px; }
+.pipe .end{
+  display:flex; align-items:center; padding:0 14px; font-family:var(--mono); font-size:11px;
+  letter-spacing:.14em; color:var(--ink-4); border:1px dashed var(--line-hi); border-radius:3px;
+}
+.gate{
+  flex:1 1 108px; min-height:78px; padding:13px 12px; text-align:left;
+  border:1px solid var(--line); border-radius:3px; background:var(--bg-2);
+  transition:.28s; position:relative; overflow:hidden;
+}
+.gate .gn{ font-family:var(--mono); font-size:10px; color:var(--ink-4); letter-spacing:.1em; display:block; margin-bottom:7px; }
+.gate .gt{ font-size:13px; font-weight:600; color:var(--ink-2); display:block; line-height:1.4; }
+.gate .gs{ font-size:11px; margin-top:7px; display:block; color:var(--ink-4); font-family:var(--mono); }
+.gate.lit{ border-color:var(--dis); background:var(--dis-dim); }
+.gate.lit .gt{ color:var(--ink); }
+.gate.lit .gn,.gate.lit .gs{ color:var(--dis); }
+.gate.blocked{ border-color:var(--danger); background:var(--danger-dim); }
+.gate.blocked .gt{ color:var(--danger); }
+.gate.blocked .gn,.gate.blocked .gs{ color:var(--danger); }
+.gate.blocked::after{ content:"✕"; position:absolute; right:10px; top:9px; font-size:11px; color:var(--danger); }
+.gate.dim{ opacity:.34; }
+.gate:hover{ border-color:var(--line-hi); }
+
+/* 状态机 */
+.switches{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:22px; }
+.sw{
+  padding:18px 18px 16px; border:1px solid var(--line); border-radius:4px; background:var(--bg-2);
+  transition:.3s; text-align:left;
+}
+.sw:hover{ border-color:var(--line-hi); }
+.sw.on{ border-color:var(--c); background:var(--c-dim); }
+.sw .st{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:9px; }
+.sw .sn{ font-size:15px; font-weight:650; color:var(--ink-3); transition:color .25s; }
+.sw.on .sn{ color:var(--c); }
+.sw .led{
+  width:26px; height:26px; border-radius:50%; border:1px solid var(--line-hi);
+  display:grid; place-items:center; font-family:var(--mono); font-size:11px; color:var(--ink-4);
+  transition:.3s; flex:0 0 auto;
+}
+.sw.on .led{ border-color:var(--c); color:var(--bg); background:var(--c); box-shadow:0 0 18px var(--c); }
+.sw .sq{ font-size:12px; color:var(--ink-4); line-height:1.6; }
+.switch-hint{ font-size:12px; color:var(--ink-4); margin-bottom:20px; font-family:var(--mono); letter-spacing:.06em; }
+.panel{ border:1px solid var(--line); border-radius:4px; background:var(--surface); overflow:hidden; }
+.panel-top{
+  display:flex; flex-wrap:wrap; align-items:center; gap:14px;
+  padding:16px 20px; border-bottom:1px solid var(--line); background:var(--surface-2);
+}
+.tagline{
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.2em; text-transform:uppercase;
+  padding:4px 11px; border-radius:2px; border:1px solid var(--pc,var(--line-hi)); color:var(--pc,var(--ink-3));
+  background:transparent;
+}
+.panel-top .pt{ font-size:17px; font-weight:650; color:var(--ink); }
+.panel-body{ padding:20px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+.pb{ padding:15px 16px; background:var(--bg-2); border:1px solid var(--line); border-radius:3px; }
+.pb .k{ font-family:var(--mono); font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-4); margin-bottom:8px; }
+.pb .v{ font-size:13.5px; color:var(--ink-2); line-height:1.8; }
+.pb .v b{ color:var(--ink); font-weight:600; }
+.panel-foot{
+  padding:16px 20px; border-top:1px solid var(--line); background:var(--bg-2);
+  font-size:13px; color:var(--ink-3); line-height:1.8;
+}
+.panel-foot b{ color:var(--ink-2); }
+.panel-foot .hl{ color:var(--def); }
+
+/* 四阶段 */
+.stages{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:30px; }
+.stage{
+  padding:20px 18px; border:1px solid var(--line); border-radius:4px; background:var(--surface);
+  transition:.3s; position:relative;
+}
+.stage:hover{ border-color:var(--line-hi); transform:translateY(-3px); }
+.stage .si{ font-family:var(--mono); font-size:10.5px; letter-spacing:.18em; color:var(--c); margin-bottom:11px; display:block; }
+.stage h4{ font-size:15px; font-weight:650; margin-bottom:8px; }
+.stage p{ font-size:12.5px; color:var(--ink-2); line-height:1.75; }
+.stage::after{
+  content:"→"; position:absolute; right:-11px; top:50%; transform:translateY(-50%);
+  color:var(--ink-4); font-size:13px; z-index:2;
+}
+.stage:last-child::after{ display:none; }
+
+/* 债务时钟 */
+.gauges{ display:flex; flex-direction:column; gap:16px; margin-bottom:20px; }
+.gauge .gl{
+  display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-bottom:8px;
+  font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-4);
+}
+.gauge .gl b{ font-family:var(--sans); font-size:13px; letter-spacing:0; text-transform:none; color:var(--ink-2); font-weight:500; }
+.bar{ height:9px; border-radius:999px; background:var(--bg-2); border:1px solid var(--line); overflow:hidden; }
+.bar i{ display:block; height:100%; width:0; border-radius:999px; transition:width .5s cubic-bezier(.3,.8,.3,1); }
+.bar.debt i{ background:linear-gradient(90deg,var(--exp),var(--danger)); }
+.bar.vis i{ background:linear-gradient(90deg,var(--def),var(--dis)); }
+.zone{ margin-top:6px; font-size:12.5px; color:var(--ink-3); min-height:24px; }
+.zone b{ color:var(--exp); font-weight:650; }
+.zone.hot b{ color:var(--danger); }
+.reversal{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:0;
+  max-height:0; overflow:hidden; opacity:0; transition:max-height .5s ease, opacity .4s ease, margin .4s ease; }
+.reversal.show{ max-height:520px; opacity:1; margin-top:18px; }
+.rev{padding:16px; border:1px solid var(--danger); border-radius:3px; background:var(--danger-dim);}
+.rev h5{ font-size:13.5px; font-weight:650; color:var(--danger); margin-bottom:8px; }
+.rev p{ font-size:12.5px; color:var(--ink-2); line-height:1.75; }
+.compare{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:26px; }
+.cmp{ padding:20px; border:1px solid var(--line); border-radius:4px; background:var(--surface); }
+.cmp.a{ border-left:2px solid var(--ink-4); }
+.cmp.b{ border-left:2px solid var(--danger); }
+.cmp h4{ font-size:15px; font-weight:700; margin-bottom:12px; }
+.cmp.a h4{ color:var(--ink-2); } .cmp.b h4{ color:var(--danger); }
+.cmp dl{ display:grid; grid-template-columns:64px 1fr; gap:7px 12px; font-size:12.5px; }
+.cmp dt{ font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; color:var(--ink-4); padding-top:2px; }
+.cmp dd{ color:var(--ink-2); line-height:1.7; }
+
+/* 自反 */
+.reflex{ display:flex; flex-direction:column; gap:0; margin-top:30px; border-top:1px solid var(--line); }
+.rx{ display:grid; grid-template-columns:170px 1fr; gap:26px; padding:24px 0; border-bottom:1px solid var(--line); }
+.rx .rk{ font-family:var(--mono); font-size:11.5px; letter-spacing:.14em; color:var(--c); padding-top:4px; }
+.rx .rv3{ font-size:14px; color:var(--ink-2); line-height:1.85; }
+.rx .rv3 b{ color:var(--ink); font-weight:600; }
+.closing{
+  margin-top:52px; padding:38px 32px; border:1px solid var(--line); border-radius:4px; text-align:center;
+  background:radial-gradient(ellipse at 50% 0%, rgba(110,168,254,.10), transparent 66%);
+}
+.closing p{ font-size:clamp(17px,2.3vw,21px); color:var(--ink); line-height:1.85; letter-spacing:.01em; }
+.closing small{ display:block; margin-top:16px; font-size:13px; color:var(--ink-3); font-family:var(--mono); letter-spacing:.06em; }
+
+/* 折叠 */
+.fold-t{
+  display:flex; align-items:center; justify-content:space-between; gap:14px; width:100%;
+  margin-top:18px; padding:15px 20px; border:1px dashed var(--line-hi); border-radius:4px;
+  font-size:13px; color:var(--ink-3); transition:.3s;
+}
+.fold-t:hover{ background:var(--surface); color:var(--ink-2); }
+.fold-t .cx{ font-family:var(--mono); font-size:15px; transition:transform .3s; }
+.fold-t.on .cx{ transform:rotate(45deg); }
+.fold{ max-height:0; overflow:hidden; opacity:0; transition:max-height .55s cubic-bezier(.3,.8,.3,1), opacity .4s; }
+.fold.on{ max-height:1600px; opacity:1; }
+.fold-in{ padding:22px 4px 6px; display:grid; gap:14px; }
+.fold-in .fi{ padding:16px 18px; border-left:2px solid var(--line-hi); background:var(--surface); border-radius:0 3px 3px 0; }
+.fold-in .fi h5{ font-size:13.5px; font-weight:650; margin-bottom:7px; color:var(--ink); }
+.fold-in .fi p{ font-size:13px; color:var(--ink-2); line-height:1.8; }
+
+/* 占位页 */
+.placeholder{
+  min-height:100svh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:120px 28px;
+}
+.placeholder .ph-n{ font-family:var(--mono); font-size:11px; letter-spacing:.3em; color:var(--ink-4); margin-bottom:20px; }
+.placeholder h2{ font-size:clamp(26px,4vw,40px); font-weight:700; margin-bottom:16px; }
+.placeholder p{ font-size:14.5px; color:var(--ink-3); max-width:520px; line-height:1.9; }
+.placeholder .ph-list{ margin-top:32px; display:flex; flex-direction:column; gap:10px; text-align:left; }
+.placeholder .ph-list div{
+  font-family:var(--mono); font-size:12px; color:var(--ink-4); letter-spacing:.06em;
+  padding:11px 16px; border:1px solid var(--line); border-radius:3px;
+}
+.placeholder .ph-list div b{ color:var(--ink-2); font-family:var(--sans); font-size:13px; font-weight:500; letter-spacing:0; }
+
+/* 页脚 */
+.foot{
+  padding:52px 0 60px; border-top:1px solid var(--line);
+  text-align:center; font-size:12.5px; color:var(--ink-4); line-height:2;
+}
+.foot .fmark{ font-family:var(--mono); font-size:11px; letter-spacing:.26em; color:var(--ink-3); margin-bottom:14px; }
+.foot a{ color:var(--ink-3); border-bottom:1px solid var(--line-hi); }
+.foot a:hover{ color:var(--ink); }
+.foot .sep{ margin:0 9px; opacity:.5; }
+
+/* ===== 响应式 ===== */
+@media (max-width:860px){
+  .panel-body{ grid-template-columns:1fr 1fr; }
+  .stages{ grid-template-columns:1fr 1fr; }
+  .stage::after{ display:none; }
+  .reversal{ grid-template-columns:1fr; }
+  .reversal.show{ max-height:900px; }
+  .rx{ grid-template-columns:1fr; gap:8px; }
+}
+@media (max-width:680px){
+  body{ font-size:15px; }
+  .wrap{ padding:0 18px; }
+  .band{ padding:70px 0; }
+  .triad{ grid-template-columns:1fr; gap:12px; }
+  .cards,.compare,.readout,.reversal{ grid-template-columns:1fr; }
+  .claim{ grid-template-columns:1fr; gap:10px; }
+  .panel-body{ grid-template-columns:1fr; }
+  .stages{ grid-template-columns:1fr; }
+  .switches{ grid-template-columns:1fr; }
+  .hero{ padding-top:104px; }
+  h1.hero-title{ letter-spacing:.03em; }
+  .hero-sub{ letter-spacing:.24em; }
+  .nav button{ padding:0 10px; font-size:12px; gap:6px; }
+  .nav button .n{ display:none; }
+  .row{ grid-template-columns:1fr; gap:5px; }
+  .pipe{ flex-direction:column; }
+  .pipe .end{ justify-content:center; padding:9px; }
+  .gate{ min-height:0; }
+  .cmp dl{ grid-template-columns:1fr; gap:3px 0; }
+  .ticks span{ font-size:11px; }
+}
+@media (prefers-reduced-motion:reduce){
+  *{ animation-duration:.01ms !important; transition-duration:.01ms !important; scroll-behavior:auto !important; }
+  .rv{ opacity:1; transform:none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ================= 导航 ================= -->
+<nav class="nav">
+  <button class="on" data-page="p1" onclick="switchPage('p1')"><span class="n">01</span>什么是三权</button>
+  <button data-page="p2" onclick="switchPage('p2')"><span class="n">02</span>怎么分析</button>
+  <button data-page="p3" onclick="switchPage('p3')"><span class="n">03</span>能做什么</button>
+</nav>
+
+<!-- ================= PAGE 1 ================= -->
+<div id="p1" class="page active">
+
+  <!-- ---------- HERO ---------- -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="eyebrow rv on">SOCIAL COGNITION ORDER · 社会认知秩序</div>
+      <h1 class="hero-title rv on">三权理论</h1>
+      <div class="hero-sub rv on">解释权 · 定义权 · 话语权</div>
+      <p class="hero-lead rv on">
+        事实不会直接进入公共认知。它必须先被<b>识别、分类和命名</b>，随后被置入某种<b>因果关系与价值框架</b>，
+        最后通过具体的组织、媒介和人际网络<b>抵达受众</b>。
+      </p>
+
+      <div class="triad rv on rv-1">
+        <div class="tcard" style="--c:var(--def)">
+          <span class="tno">01 / 起点</span>
+          <div class="tname">定义权</div>
+          <div class="tq">回答 · 这是什么</div>
+          <div class="tdesc">确定对象的名称、类别、边界和基本性质。名称一旦与对象稳定连接，与这个类别相联系的判断标准、情感反应与处置方式也会随之进入讨论。</div>
+          <div class="tkey">命名 · 分类 · 划界 · 标准</div>
+        </div>
+        <div class="tcard" style="--c:var(--exp)">
+          <span class="tno">02 / 意义</span>
+          <div class="tname">解释权</div>
+          <div class="tq">回答 · 为什么、意味着什么</div>
+          <div class="tdesc">赋予事实以原因、意义和责任关系。解释并不改变已经发生的事实，却能够改变事实在社会认知中的位置。</div>
+          <div class="tkey">因果 · 责任 · 尺度 · 定型</div>
+        </div>
+        <div class="tcard" style="--c:var(--dis)">
+          <span class="tno">03 / 流通</span>
+          <div class="tname">话语权</div>
+          <div class="tq">回答 · 能否抵达、能否留下</div>
+          <div class="tdesc">使定义与解释进入传播过程，并获得可见性、持续性和影响力。不仅表现为能否发言，还表现为发言能否被重复、能否进入有影响力的节点。</div>
+          <div class="tkey">资格 · 渠道 · 信任 · 转发</div>
+        </div>
+      </div>
+
+      <div class="hero-note rv on rv-2">
+        <span class="bar"></span>
+        <span>三者共用一个「权」字，却不是同一种权力的三个名字。<b>「权」首先指一种能够产生实际后果的能力</b>——判断一个主体是否拥有某种权，不能只看他是否被允许定义、解释或发言，还要看他的定义是否被采用、解释是否被接受、表达是否真正进入了受众的认知。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- 命题带 ---------- -->
+  <section class="band">
+    <div class="wrap">
+      <div class="sec-kicker rv"><b>01</b> 三个位置</div>
+      <h2 class="sec-title rv">社会中的许多冲突，发生在比「答案」更早的位置</h2>
+      <p class="sec-lead rv">争夺双方未必对同一个问题给出不同答案。他们真正争夺的是——<em>什么才算问题、谁有资格说明问题，以及哪一种说法能够成为公共讨论的起点</em>。</p>
+
+      <div class="claims rv rv-1">
+        <div class="claim" style="--c:var(--def)">
+          <div class="cl"><span class="dot"></span>定义权</div>
+          <div class="ct">决定讨论对象是什么
+            <small>它规定人们应当从哪个方向认识对象，并把不同的认知成本分配给争论各方。</small>
+          </div>
+        </div>
+        <div class="claim" style="--c:var(--exp)">
+          <div class="cl"><span class="dot"></span>解释权</div>
+          <div class="ct">决定它意味着什么
+            <small>同一个结果可以被解释为个人选择、制度问题、偶然事故或者必要代价，不同解释引出不同的责任判断和行动方向。</small>
+          </div>
+        </div>
+        <div class="claim" style="--c:var(--dis)">
+          <div class="cl"><span class="dot"></span>话语权</div>
+          <div class="ct">决定谁能够听见
+            <small>一种声音可能在形式上始终存在，却因为无法进入有效传播渠道而几乎不产生社会后果。</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="statement rv rv-2">
+        事实并未因此变得不重要。但事实能否被识别为事实，能否获得稳定的意义，能否进入多数人的认知，必须经过这一结构。
+        <span>—— 导论 · 三权与社会认知秩序</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- 图版 ---------- -->
+  <section class="band">
+    <div class="wrap">
+      <div class="sec-kicker rv"><b>02</b> 概念地图</div>
+      <h2 class="sec-title rv">三权是一次接力，不是三个并列的抽屉</h2>
+      <p class="sec-lead rv">定义造概念、话语铺渠道、解释定结局；而解释一旦成功，又会反过来证明原定义「准确」，提高定义者下一次命名的资格。点击任一维度展开它的内部环节。</p>
+
+      <div class="plate rv rv-1">
+        <div class="plate-bar">
+          <span class="l"><i></i>图 01 · 三权与认知链</span>
+          <span>点击维度展开 · 再次点击收起</span>
+        </div>
+        <canvas id="atlas" width="960" height="700"></canvas>
+        <div class="plate-cap">
+          <span><i style="background:var(--def);box-shadow:0 0 10px var(--def)"></i>定义权 · 认知起点</span>
+          <span><i style="background:var(--exp);box-shadow:0 0 10px var(--exp)"></i>解释权 · 意义收束</span>
+          <span><i style="background:var(--dis);box-shadow:0 0 10px var(--dis)"></i>话语权 · 抵达与流通</span>
+          <span><i style="background:var(--ink-4)"></i>弧线 · 接力方向</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- 定义权 ---------- -->
+  <section class="band">
+    <div class="wrap">
+      <div class="sec-kicker rv" style="color:var(--def)"><b>03</b> 定义权</div>
+      <h2 class="sec-title rv">先决定人们正在面对什么</h2>
+      <p class="sec-lead rv">定义权不直接回答一件事情为什么发生，也不负责把某种说法传播给多少人，而是<b>先决定人们正在面对什么</b>。它先于解释权，因为只有对象被确认以后，人们才能进一步讨论它为什么出现。</p>
+
+      <div class="cards rv rv-1" style="--c:var(--def)">
+        <div class="card">
+          <h4>认知压缩</h4>
+          <p>定义者不必否认其他事实，只要<b>选出一组特征作为对象的核心</b>，其余事实便会被重新安排为背景、特例或无关信息。定义在这里完成的是认知压缩，它把复杂现实转化为一个可以识别、讨论和处理的对象。</p>
+        </div>
+        <div class="card">
+          <h4>举证责任的反转</h4>
+          <p>默认定义的支持者可以直接沿用现有名称和分类，挑战者却要先说明原定义忽略了什么、为什么需要更换、新定义又能够解决什么问题。<b>只要反对者必须先处理既有定义，定义权就已经发挥作用。</b></p>
+        </div>
+        <div class="card">
+          <h4>标准就是跑道</h4>
+          <p>名称、分类和标准结合以后，讨论的跑道便形成了。标准看似只是测量工具，实际上已经规定了<b>什么值得被测量</b>。设定标准的人不必直接决定每个具体结果，只要让所有参与者必须依据同一尺度证明自己。</p>
+        </div>
+        <div class="card">
+          <h4>定义权始终有范围</h4>
+          <p>管理者可以在组织内部规定工作性质，却无法完全控制成员私下如何描述。同一个主体在一个场域中是定义者，<b>进入更大的制度和传播结构后又可能成为被定义者</b>。</p>
+        </div>
+      </div>
+
+      <div class="widget rv rv-2" style="--c:var(--def)">
+        <div class="w-head">
+          <span class="w-label">交互 01 · 定义闭合</span>
+          <span class="w-hint">选一个标签，看对象的每种反应如何被吸收为原定义的证据</span>
+        </div>
+        <div class="chips" id="closureChips"></div>
+        <div class="badge" id="closureBadge"></div>
+        <div class="rows" id="closureRows"></div>
+        <div class="w-note" id="closureNote"></div>
+      </div>
+
+      <button class="fold-t rv rv-3" onclick="toggleFold(this)"><span>展开 · 定义权的取得、固化与危机</span><span class="cx">＋</span></button>
+      <div class="fold">
+        <div class="fold-in">
+          <div class="fi">
+            <h5>取得 ≠ 固化</h5>
+            <p>定义资格大致来自三类基础：制度与法律提供的正式授权、专业知识与亲历经验提供的认识正当性、平台标签与技术标准把定义嵌入系统。但这些都只是起点。只有当人们开始使用某个名称、接受它划定的边界，并依据它提供的标准处理问题时，定义资格才转化为实际的定义权。</p>
+          </div>
+          <div class="fi">
+            <h5>最隐蔽的定义，不像人为定义</h5>
+            <p>一个名称被媒体、制度、组织和普通人持续采用之后，会逐渐脱离最初的提出者，进入文件、统计、平台规则和日常语言。定义的来源随之淡化，定义本身则开始表现为常识。人们不再追问为什么选择这种分类，而是把已经形成的认识方式当作对象本来的样子。</p>
+          </div>
+          <div class="fi">
+            <h5>定义危机：惯性 → 危机 → 重置</h5>
+            <p>惯性期内，反例被当作个案；进入危机期后，反例开始彼此连接，受众怀疑的不再只是某次分类是否准确，而是原定义选择的特征、边界和标准是否仍然有效。但旧定义失效并不会自动产生新定义——危机初期往往伴随概念混乱，多种竞争性名称会试图占据空缺。</p>
+          </div>
+          <div class="fi">
+            <h5>重置的制度成本</h5>
+            <p>很多新概念能够在舆论中流行，却无法进入组织和制度，原因就在于它完成了命名，却没有承担分类重构带来的现实代价：档案如何修改、资格如何重新认定、依赖旧分类获得地位的主体怎样安置。定义权由此获得一种不依赖强制力的稳固——它不需要有人继续捍卫，只需要没人愿意承担改动的代价。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- 解释权 ---------- -->
+  <section class="band">
+    <div class="wrap">
+      <div class="sec-kicker rv" style="color:var(--exp)"><b>04</b> 解释权</div>
+      <h2 class="sec-title rv">事实与意义之间有一道缝隙</h2>
+      <p class="sec-lead rv">缝隙并不意味着事实可以被任意解释，而是意味着<b>事实通常无法单独完成因果排序和价值判断</b>。事情越复杂、信息越不完整、涉及主体越多，这道缝隙就越大。解释权的争夺，本质上是在争夺由哪套认知框架填补这道缝隙。</p>
+
+      <div class="cards rv rv-1" style="--c:var(--exp)">
+        <div class="card">
+          <h4>选择 → 连接 → 归因 → 定型</h4>
+          <p>解释者先决定什么材料值得进入说明，再把不同事实连接起来建立先后、因果与主次关系，随后据此分配动机与责任，最后为整个事件确定一种可被理解和记忆的意义。</p>
+        </div>
+        <div class="card">
+          <h4>一种「停止追问」的能力</h4>
+          <p>如果只寻找离结果最近的行为，责任容易集中到最直接的行动者身上；如果不断向外追溯，更多结构性条件会被看见。<b>谁能够决定原因追溯到哪一层，谁就能够决定哪些主体进入责任范围。</b></p>
+        </div>
+        <div class="card">
+          <h4>第一解释的优势</h4>
+          <p>一个未经证实但结构完整的版本，可能比大量彼此分散的真实材料更早进入认知——因为前者已经回答了受众最迫切的问题。第一解释不一定最准确，却让后来者承担拆解旧框架的额外成本。</p>
+        </div>
+        <div class="card">
+          <h4>解释吸收</h4>
+          <p>强势解释不需要逐条击败反对意见，只需要为反对行为预先安排位置：<b>辩解被解释为掩饰，反击被解释为失控，拒绝参与被解释为缺乏依据。</b></p>
+        </div>
+      </div>
+
+      <div class="widget rv rv-2" style="--c:var(--exp)">
+        <div class="w-head">
+          <span class="w-label">交互 02 · 因果起点</span>
+          <span class="w-hint">拖动滑块改变「因果链从哪里开始」，看结论形状与责任落点如何移动</span>
+        </div>
+        <div class="track-wrap">
+          <input type="range" id="causalRange" min="0" max="2" step="1" value="0" aria-label="因果链起点">
+          <div class="ticks" id="causalTicks">
+            <span>从操作人员违规讲起</span>
+            <span>从检修计划被推迟讲起</span>
+            <span>从设备老化和生产压力讲起</span>
+          </div>
+        </div>
+        <div class="chain" id="causalChain"></div>
+        <div class="readout">
+          <div class="ro" style="--c:var(--exp)">
+            <div class="k">结论形状</div>
+            <div class="v" id="causalConclusion"></div>
+          </div>
+          <div class="ro" style="--c:var(--exp)">
+            <div class="k">责任落点</div>
+            <div class="v" id="causalDuty"></div>
+          </div>
+        </div>
+        <div class="w-note" id="causalNote"></div>
+      </div>
+
+      <button class="fold-t rv rv-3" onclick="toggleFold(this)"><span>展开 · 解释资格与解释翻盘</span><span class="cx">＋</span></button>
+      <div class="fold">
+        <div class="fold-in">
+          <div class="fi">
+            <h5>解释资格由两种条件共同构成</h5>
+            <p>一种是接近事实和组织材料的能力，另一种是让社会承认自身解释的能力。最接近事件的人未必最受信任，最受信任的人也未必掌握完整事实。当这两种能力集中在同一主体手中时，他既能够选择材料，又能够决定材料如何被评价，解释权便会变得十分稳定。</p>
+          </div>
+          <div class="fi">
+            <h5>证据资格控制解释的入口</h5>
+            <p>如果某类经验从一开始就不被承认为证据，拥有这种经验的人即使不断发言，也很难改变正式结论。解释权并不总是通过否认事实发挥作用，它也可以通过规定事实必须以什么形式出现，提前决定哪些材料能够被看见。</p>
+          </div>
+          <div class="fi">
+            <h5>翻盘需要四种变化相互配合</h5>
+            <p>新的证据必须足以动摇原有因果链；旧解释自身需要暴露明显矛盾；原解释者的信用或资格往往同时下降；更重要的是，必须存在一套能够重新组织事实的替代解释。只有证明旧版本错误，而无法说明事情究竟应当怎样理解，只会制造意义空缺——受众在短暂怀疑之后，仍可能因为熟悉而返回旧解释。</p>
+          </div>
+          <div class="fi">
+            <h5>翻盘的代价由固化程度决定</h5>
+            <p>一个解释存在得越久，与之相连的身份、声誉和利益越多，改变它的成本就越高。承认新版本可能意味着重新追责、恢复名誉、调整制度，甚至否定群体长期相信的自我形象。人们拒绝新解释，不一定只是因为证据不足，也可能是因为接受它会迫使自己重新理解过去。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- 话语权 ---------- -->
+  <section class="band">
+    <div class="wrap">
+      <div class="sec-kicker rv" style="color:var(--dis)"><b>05</b> 话语权</div>
+      <h2 class="sec-title rv">能说话只是起点</h2>
+      <p class="sec-lead rv">一个人可以被允许说话，却没有能够接触的受众；也可以拥有大量受众，却因为缺乏信任而无法影响判断。<b>声音能否进入他人的认知，才是判断话语权是否存在的关键。</b></p>
+
+      <div class="cards rv rv-1" style="--c:var(--dis)">
+        <div class="card">
+          <h4>音量不等于话语权</h4>
+          <p>高频表达可以制造可见性，却不能保证受众停留；大范围覆盖可以带来曝光，却不能保证信息被记住。音量只解决「有没有出现」，话语权还要回答<b>出现在谁面前、以什么方式出现、出现以后留下了什么</b>。</p>
+        </div>
+        <div class="card">
+          <h4>名义受众 ≠ 实际受众</h4>
+          <p>一个账号拥有大量关注者，不代表每次表达都能触及这些人；一份文件被发送到所有成员，不代表所有成员都会阅读。衡量话语权不能只看数字，还要看信息在目标人群中的实际触达。</p>
+        </div>
+        <div class="card">
+          <h4>信任链是捷径，也是改写器</h4>
+          <p>转发者在传播信息时，不只扩大覆盖范围，也把自己的信用暂时附加到信息上。但信息每经过一个节点，节点都会根据自身立场重新选择内容——<b>传播范围扩大了，信息也可能逐渐偏离最初含义。</b></p>
+        </div>
+        <div class="card">
+          <h4>沉默的两种含义</h4>
+          <p>拥有话语权的主体可以暂时不回应，等待信息更完整或选择更合适的时机——他的沉默之所以有意义，是因为受众知道他仍然有能力发声。被迫沉默则完全不同：不是主动选择不说，而是无法进入传播链。</p>
+        </div>
+      </div>
+
+      <div class="widget rv rv-2" style="--c:var(--dis)">
+        <div class="w-head">
+          <span class="w-label">交互 03 · 传播链五道闸门</span>
+          <span class="w-hint">点击任一闸门切换「打开／受阻」，看声音停在哪里</span>
+        </div>
+        <div class="pipe" id="pipeTrack"></div>
+        <div class="w-note" id="pipeNote"></div>
+      </div>
+
+      <button class="fold-t rv rv-3" onclick="toggleFold(this)"><span>展开 · 跨群体传播与最深的排除</span><span class="cx">＋</span></button>
+      <div class="fold">
+        <div class="fold-in">
+          <div class="fi">
+            <h5>越过圈层需要重新编码</h5>
+            <p>不同群体使用不同语言、拥有不同经验、也信任不同的人。表达者要把圈内语言转换为圈外受众能够理解的概念，把本群体的特殊经验连接到更普遍的问题。如果转换只保留情绪，外部受众可能看见冲突却无法理解原因；如果只保留抽象概念，原始经验又可能被处理得过于干净。</p>
+          </div>
+          <div class="fi">
+            <h5>桥接节点与意义损耗</h5>
+            <p>桥接者同时接触多个群体，能够把原本只在圈内有效的内容带入另一个传播网络。桥接节点越多，信息越容易扩散，但表达者对意义的控制也会随之下降。表面覆盖范围扩大了，话语的实际目标却可能被削弱。</p>
+          </div>
+          <div class="fi">
+            <h5>最深一层的排除</h5>
+            <p>当事者可以陈述经历，但陈述被归入情绪；普通成员可以指出问题，却因为缺乏专业身份而被视为主观感受；边缘群体不断提供相似经验，仍然可能被当作互不相关的个案。<b>此时主体并非没有声音，而是声音无法取得知识和判断资格。</b>它可以被看见，却不能进入主要解释。</p>
+          </div>
+          <div class="fi">
+            <h5>从话语排除到认知消灭</h5>
+            <p>一个主体长期无法进入讨论，社会便只能通过其他人的定义和解释认识他。缺少回应的版本逐渐固定，缺少记录的经验逐渐消失，最后连「曾经存在另一种说法」都不再被记得。话语排除由此不只是传播上的失败，也是认知消灭的第一步。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- 状态机 ---------- -->
+  <section class="band">
+    <div class="wrap">
+      <div class="sec-kicker rv"><b>06</b> 组合与状态</div>
+      <h2 class="sec-title rv">一项功能只能把结果交给别人处理，两项才能形成回路</h2>
+      <p class="sec-lead rv">三项功能在分析上可以分开讨论，在现实中却常常落在不同主体手里。<b>同时掌握两项功能的一方，通常足以形成稳定主导，不必三权齐备。</b>试着打开或关闭任意组合。</p>
+
+      <div class="switches rv rv-1">
+        <button class="sw on" id="swDef" style="--c:var(--def)" onclick="toggleSw('def')">
+          <span class="st"><span class="sn">定义权</span><span class="led">01</span></span>
+          <span class="sq">命名 · 分类 · 划界 · 标准</span>
+        </button>
+        <button class="sw" id="swExp" style="--c:var(--exp)" onclick="toggleSw('exp')">
+          <span class="st"><span class="sn">解释权</span><span class="led">02</span></span>
+          <span class="sq">因果 · 责任 · 意义 · 定型</span>
+        </button>
+        <button class="sw" id="swDis" style="--c:var(--dis)" onclick="toggleSw('dis')">
+          <span class="st"><span class="sn">话语权</span><span class="led">03</span></span>
+          <span class="sq">资格 · 渠道 · 抵达 · 信任</span>
+        </button>
+      </div>
+      <div class="switch-hint rv rv-1">※ 默认只打开定义权，正是「有概念，却没有扩散和定论」的常见处境</div>
+
+      <div class="panel rv rv-2">
+        <div class="panel-top">
+          <span class="tagline" id="smTag">单权状态</span>
+          <span class="pt" id="smTitle">仅掌握定义权</span>
+        </div>
+        <div class="panel-body">
+          <div class="pb"><div class="k">能够做到</div><div class="v" id="smCan"></div></div>
+          <div class="pb"><div class="k">卡在哪里</div><div class="v" id="smStuck"></div></div>
+          <div class="pb"><div class="k">所处状态</div><div class="v" id="smState"></div></div>
+        </div>
+        <div class="panel-foot" id="smFoot"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- 闭环 + 反噬 ---------- -->
+  <section class="band">
+    <div class="wrap">
+      <div class="sec-kicker rv"><b>07</b> 运行与结算</div>
+      <h2 class="sec-title rv">闭环每运行一次，都会重新分配下一轮的起点</h2>
+      <p class="sec-lead rv">成功解释会证明原定义「准确」，得到广泛接受的版本会增强解释者的公信力，渠道也会因为曾经成功组织受众而扩大自身影响。<b>上一轮形成的名称、信用和网络，成为下一轮竞争的初始资源。</b></p>
+
+      <div class="stages rv rv-1">
+        <div class="stage" style="--c:var(--def)">
+          <span class="si">阶段 01</span>
+          <h4>启动</h4>
+          <p>由定义承担主要作用。复杂现象被提取、命名和分类，原本分散的事实成为可以讨论的对象。</p>
+        </div>
+        <div class="stage" style="--c:var(--dis)">
+          <span class="si">阶段 02</span>
+          <h4>铺开</h4>
+          <p>由话语权承担主要作用。名称在频次、覆盖和信任链中获得可见性；传播同时也在筛选定义。</p>
+        </div>
+        <div class="stage" style="--c:var(--exp)">
+          <span class="si">阶段 03</span>
+          <h4>落地</h4>
+          <p>由解释完成意义收束。传播留下的模糊印象转化为相对稳定的主要版本，并进入制度结论与群体记忆。</p>
+        </div>
+        <div class="stage" style="--c:var(--def)">
+          <span class="si">阶段 04</span>
+          <h4>反哺</h4>
+          <p>成功的版本提高原定义者与解释者的资格，扩大渠道影响——也成为下一轮竞争的初始资源。</p>
+        </div>
+      </div>
+
+      <div class="widget rv rv-2" style="--c:var(--danger)">
+        <div class="w-head">
+          <span class="w-label">交互 04 · 解释债务时钟</span>
+          <span class="w-hint">拖动滑块收紧闭合程度，观察债务与可见性两条线的走势</span>
+        </div>
+        <input type="range" class="danger" id="debtRange" min="0" max="100" step="1" value="8" aria-label="说法的封闭程度">
+        <div class="gauges">
+          <div class="gauge">
+            <div class="gl"><span>解释债务 · 未来需要兑付的义务</span><b id="debtVal">8 / 100</b></div>
+            <div class="bar debt"><i id="debtBar"></i></div>
+          </div>
+          <div class="gauge">
+            <div class="gl"><span>可见性 · 短期看起来的效果</span><b id="visVal">—</b></div>
+            <div class="bar vis"><i id="visBar"></i></div>
+          </div>
+        </div>
+        <div class="zone" id="debtZone"></div>
+        <div class="reversal" id="debtReversal">
+          <div class="rev"><h5>标签回流</h5><p>标签一旦与主体自身绑定，此后关于它的所有信息都会沿标签被理解。操弄者在标签上积累得越成功，回流时的传播效率就越高。标签形成快、回流快、洗刷慢。</p></div>
+          <div class="rev"><h5>信誉反噬</h5><p>信誉不提高任何一条具体信息的效果，而是降低所有信息的验证成本。它受损之后，此后即使提供完全准确的材料，也要承担额外的怀疑成本——修复的工具要在已经受损的条件下运行。</p></div>
+          <div class="rev"><h5>叙事反转</h5><p>过去反复作出的承诺会被用来证明现实落差，曾经用于攻击对手的标签会被重新套回叙事提供者身上。高频重复曾经帮助它进入社会记忆，失效后，这些记忆又成为人们证明其长期失真的依据。</p></div>
+        </div>
+        <div class="w-note" id="debtNote"></div>
+      </div>
+
+      <div class="compare rv rv-3">
+        <div class="cmp a">
+          <h4>失效 · 模式失效</h4>
+          <dl>
+            <dt>性质</dt><dd>效力衰减，方向中性</dd>
+            <dt>表现</dt><dd>仍然被理解、仍在使用，只是不再能推动行动。人们口头认可，实际选择按自己的处境来</dd>
+            <dt>原因</dt><dd>条件变了：经验不再支持、替代渠道出现、行动成本上升、注意力转移</dd>
+            <dt>应对</dt><dd>更新内容：补充理由、更新表述、重新连接利益</dd>
+          </dl>
+        </div>
+        <div class="cmp b">
+          <h4>反噬 · 账户透支</h4>
+          <dl>
+            <dt>性质</dt><dd>有方向的清算</dd>
+            <dt>表现</dt><dd>把过去的操作转成负面资产：承诺变成落差证据，标签变成被反问的入口</dd>
+            <dt>原因</dt><dd>此前作出的说明对未来事实构成义务，义务被要求兑付</dd>
+            <dt>应对</dt><dd>降低强度，并承担已经发生的债务</dd>
+          </dl>
+        </div>
+      </div>
+      <div class="statement rv rv-3" style="border-left-color:var(--danger);margin-top:26px">
+        区分二者的关键指标不是声量，而是——原有文本是否被反过来引用。
+        <span>如果质疑者只是在说「现在不管用了」，属于失效，可以修正；如果他们能引用原主体的原话，属于反噬，只能处理。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ---------- 自反 ---------- -->
+  <section class="band">
+    <div class="wrap">
+      <div class="sec-kicker rv"><b>08</b> 自反</div>
+      <h2 class="sec-title rv">用三权理论量三权理论自己</h2>
+      <p class="sec-lead rv">一套分析框架如果不肯接受自己那套尺子的测量，它就已经在自己身上试验了「定义闭合」。</p>
+
+      <div class="reflex rv rv-1">
+        <div class="rx" style="--c:var(--def)">
+          <div class="rk">定义权 · 它做了什么</div>
+          <div class="rv3">它把此前被整体处理的「话语」「象征」「霸权」<b>重新拆分并命名为三个功能位置</b>。这是一次命名行为：它选择了一组特征（可分性、可组合、可转移）作为这套说法区别于既有传统的核心。</div>
+        </div>
+        <div class="rx" style="--c:var(--exp)">
+          <div class="rk">解释权 · 它做了什么</div>
+          <div class="rv3">它给出了「为什么两权足以主导」「为什么会形成反噬」「为什么迁移有先后」的因果结构。它也<b>为自己指定了举证责任</b>：把四项增量都写成可证伪的命题，并给出应当被放弃的条件。</div>
+        </div>
+        <div class="rx" style="--c:var(--dis)">
+          <div class="rk">话语权 · 它能否生效</div>
+          <div class="rv3">按它自己的标准，这套说法能否成立，<b>不取决于它是否严密，而取决于是否有人开始使用这套概念去分析具体的竞争</b>。没有第二个人使用它，它就还停留在提出者的文本里。</div>
+        </div>
+        <div class="rx" style="--c:var(--danger)">
+          <div class="rk">解释债务 · 它欠了什么</div>
+          <div class="rv3">它自己也在积累义务。「两权足以主导」这个断言越绝对，未来要兑付的场合越多。它给出的降低风险条件是：<b>可修正性 · 解释冗余 · 渠道分散 · 信用储备</b>——而这四项的共同点是，都降低短期效率。</div>
+        </div>
+      </div>
+
+      <div class="closing rv rv-2">
+        <p>这套结构能否继续使用，不取决于它是否被相信，<br>而取决于它能否继续被用来提出可检验的问题。</p>
+        <small>谁在命名 · 谁在定论 · 谁在传播</small>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="fmark">三权理论 · 展示页</div>
+    <p><strong style="color:var(--ink-2)">三权理论 © 2026 李政恒 (Li Zhengheng)</strong></p>
+    <p>许可协议：<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a><span class="sep">·</span>仅用于学习交流</p>
+    <p style="margin-top:12px;font-size:11.5px">依据《解释权 · 定义权 · 话语权——社会认知秩序中的定义、解释与传播》整理</p>
+  </footer>
+
+</div><!-- /p1 -->
+
+<!-- ================= PAGE 2 ================= -->
+<div id="p2" class="page">
+  <div class="placeholder">
+    <div class="ph-n">PAGE 02 / 待建</div>
+    <h2>怎么用三权做一次分析</h2>
+    <p>这一页将给出可照做的复盘路径与常见误判清单。首版先交付 Page1，待你验收风格与手感之后再补。</p>
+    <div class="ph-list">
+      <div><b>六步复盘追问链</b> — 谁命名 · 什么事实进入主因果 · 责任在哪停止 · 哪些渠道给了可见性 · 对手被迫证明了什么 · 哪套说法进了记录</div>
+      <div><b>六大常见误判</b> — 把形式权利当实际能力 · 把单权当全权 · 把压制当信服 · 把失效当反噬 · 把音量当话语权 · 把叙事当第四权</div>
+      <div><b>四步上手</b> — 选场域 → 定位功能位置 → 判断组合状态 → 查反噬风险</div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= PAGE 3 ================= -->
+<div id="p3" class="page">
+  <div class="placeholder">
+    <div class="ph-n">PAGE 03 / 待建</div>
+    <h2>能做什么，以及在哪儿会失效</h2>
+    <p>这一页将给出适用领域、适用边界，以及这套理论与既有思想传统的对话关系。首版先交付 Page1，待你验收后再补。</p>
+    <div class="ph-list">
+      <div><b>与八位前辈的对话</b> — 福柯 · 布迪厄 · 维特根斯坦 · 葛兰西 · 奥斯汀 · 哈贝马斯 · 霍尔 · 拉克劳与墨菲</div>
+      <div><b>适用边界四条</b> — 不处理生理认知机制 · 不解释权力的全部运作 · 外推受场域限制 · 不对意义内容作判断</div>
+      <div><b>五类场域</b> — 政府 · 公司商业 · 组织机构 · 团队社群 · 互联网数字平台</div>
+      <div><b>场域迁移规律</b> — 话语权最容易迁移，解释权次之，定义权最难</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   三权理论 展示页 · 交互脚本
+   无外部依赖，全部原生实现
+   ============================================================ */
+
+/* ---------- 页面切换 ---------- */
+function switchPage(id){
+  var pages = document.querySelectorAll('.page');
+  for (var i = 0; i < pages.length; i++) pages[i].classList.remove('active');
+  var page = document.getElementById(id);
+  if (page) page.classList.add('active');
+
+  var btns = document.querySelectorAll('.nav button');
+  for (var j = 0; j < btns.length; j++) btns[j].classList.remove('on');
+  var btn = document.querySelector('.nav button[data-page="' + id + '"]');
+  if (btn) btn.classList.add('on');
+
+  if (page){
+    var rvs = page.querySelectorAll('.rv');
+    for (var k = 0; k < rvs.length; k++){
+      var r = rvs[k].getBoundingClientRect();
+      if (r.top < window.innerHeight * 0.95) rvs[k].classList.add('on');
+    }
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ---------- 滚动显现 ---------- */
+(function(){
+  var els = document.querySelectorAll('.rv');
+  if (!('IntersectionObserver' in window)){
+    for (var i = 0; i < els.length; i++) els[i].classList.add('on');
+    return;
+  }
+  var ob = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (e.isIntersecting) e.target.classList.add('on');
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+  for (var j = 0; j < els.length; j++) ob.observe(els[j]);
+})();
+
+/* ---------- 折叠 ---------- */
+function toggleFold(btn){
+  var body = btn.nextElementSibling;
+  if (!body || !body.classList.contains('fold')) return;
+  var open = body.classList.toggle('on');
+  btn.classList.toggle('on', open);
+  var label = btn.querySelector('span');
+  if (label){
+    var txt = label.getAttribute('data-t') || label.textContent;
+    label.setAttribute('data-t', txt);
+    label.textContent = open ? txt.replace('展开', '收起') : txt;
+  }
+}
+
+/* ============================================================
+   交互 01 · 定义闭合
+   ============================================================ */
+var CLOSURE = {
+  '不理性': {
+    rows: [
+      ['激烈回应', '被读作：<em>果然不理性</em>'],
+      ['平静回应', '被读作：<em>伪装，或刻意克制</em>'],
+      ['拒绝回应', '被读作：<em>无话可说，即默认</em>'],
+      ['自己收集证据', '被读作：<em>情绪化的自我辩护</em>']
+    ],
+    note: '定义闭合的运作方式：先为对象确定性质，再根据这一性质解释对象的一切表现，最后用经过解释的表现反过来证明最初定义。<b>对象越试图摆脱分类，越可能被认为符合分类预期。</b>'
+  },
+  '别有用心': {
+    rows: [
+      ['说明理由', '被读作：<em>早有准备的辩解</em>'],
+      ['拒绝解释', '被读作：<em>默认动机不纯</em>'],
+      ['出示证据', '被读作：<em>选择性出示，反证在经营形象</em>'],
+      ['要求对方举证', '被读作：<em>转移话题</em>']
+    ],
+    note: '标签一旦被接受，受众便倾向于从标签出发理解对象的后续行为。标签并没有自动垄断解释权，<b>却会明显压缩其他解释的进入空间</b>。'
+  },
+  '不够专业': {
+    rows: [
+      ['引用数据', '被读作：<em>术语堆砌，回避要害</em>'],
+      ['承认不确定', '被读作：<em>果然没有能力下判断</em>'],
+      ['请第三方背书', '被读作：<em>拉关系，不是自身判断</em>'],
+      ['从亲身经验出发', '被读作：<em>个案不能代表一般情况</em>']
+    ],
+    note: '复杂化门槛是标准控制的另一种形式——当复杂程度超过问题本身需要，并且只对外部参与者提出时，<b>知识门槛便会转化为资格门槛</b>。当事经验无法转换成专业格式，也难以进入正式讨论。'
+  },
+  '自我炒作': {
+    rows: [
+      ['保持低调', '被读作：<em>欲擒故纵</em>'],
+      ['正面回应', '被读作：<em>借机扩大声量</em>'],
+      ['不再提及', '被读作：<em>热度过去，无可辩驳</em>'],
+      ['停止更新', '被读作：<em>目的已达到，收工</em>']
+    ],
+    note: '标签真正锁定的不是对象本身，<b>而是受众以后处理对象信息的默认方向</b>。它降低识别成本，也压缩个体差异和改变可能。'
+  }
+};
+
+var closureTag = '不理性';
+
+function renderClosure(){
+  var chips = document.getElementById('closureChips');
+  var badge = document.getElementById('closureBadge');
+  var rows = document.getElementById('closureRows');
+  var note = document.getElementById('closureNote');
+  if (!chips || !badge || !rows || !note) return;
+
+  var keys = Object.keys(CLOSURE);
+  chips.innerHTML = '';
+  keys.forEach(function(k){
+    var b = document.createElement('button');
+    b.className = 'chip' + (k === closureTag ? ' on' : '');
+    b.textContent = k;
+    b.onclick = function(){ closureTag = k; renderClosure(); };
+    chips.appendChild(b);
+  });
+
+  badge.innerHTML = '对象被定义为 <b>「' + closureTag + '」</b>';
+  var data = CLOSURE[closureTag];
+  rows.innerHTML = '';
+  data.rows.forEach(function(r, i){
+    var d = document.createElement('div');
+    d.className = 'row';
+    d.style.animationDelay = (i * 90) + 'ms';
+    d.innerHTML = '<span class="rk">' + r[0] + '</span><span class="rv2">' + r[1] + '</span>';
+    rows.appendChild(d);
+  });
+  note.innerHTML = data.note;
+}
+
+/* ============================================================
+   交互 02 · 因果起点
+   ============================================================ */
+var MATERIALS = ['设备老化', '培训不足', '检修计划被推迟', '操作人员违规', '事故发生'];
+
+var CAUSAL = [
+  { start: 3,
+    conclusion: '个人失误',
+    duty: '直接行动者 · 操作人员',
+    note: '因果链被压缩到离结果最近的行为，责任集中到最直接的行动者身上。<b>把起点放在按错按钮，组织就可以通过更换责任人来保存原有机制。</b>' },
+  { start: 2,
+    conclusion: '管理责任',
+    duty: '管理决策层',
+    note: '起点前移到检修计划，管理决定进入核心。操作失误仍然存在，但它的位置从原因变成了结果——<b>设备故障、培训不足与管理压力，决定了这次失误为什么会造成严重后果。</b>' },
+  { start: 0,
+    conclusion: '组织机制长期运行的结果',
+    duty: '制度与资源安排',
+    note: '原因越向外追溯，更多结构性条件被看见，责任范围随之扩大。<b>解释权的效果，取决于哪一层最终被社会认定为主要原因。</b>' }
+];
+
+function renderCausal(){
+  var range = document.getElementById('causalRange');
+  var chain = document.getElementById('causalChain');
+  var con = document.getElementById('causalConclusion');
+  var duty = document.getElementById('causalDuty');
+  var note = document.getElementById('causalNote');
+  if (!range || !chain) return;
+
+  var idx = parseInt(range.value, 10) || 0;
+  var cfg = CAUSAL[idx];
+  var start = cfg.start;
+
+  chain.innerHTML = '';
+  MATERIALS.forEach(function(name, i){
+    if (i > 0){
+      var s = document.createElement('span');
+      s.className = 'sep';
+      s.textContent = '→';
+      chain.appendChild(s);
+    }
+    var d = document.createElement('span');
+    var cls = 'node';
+    if (i === MATERIALS.length - 1) cls += ' effect';
+    else if (i < start) cls += ' bg';
+    else cls += ' cause';
+    d.className = cls;
+    d.textContent = name;
+    chain.appendChild(d);
+  });
+
+  con.textContent = cfg.conclusion;
+  duty.textContent = cfg.duty;
+  note.innerHTML = cfg.note;
+
+  var ticks = document.getElementById('causalTicks');
+  if (ticks){
+    var spans = ticks.querySelectorAll('span');
+    for (var t = 0; t < spans.length; t++) spans[t].classList.toggle('hi', t === idx);
+  }
+}
+
+/* ============================================================
+   交互 03 · 传播链五道闸门
+   ============================================================ */
+var GATES = [
+  { name: '发言资格', sub: '能否被承认' },
+  { name: '渠道入口', sub: '能否接得上' },
+  { name: '抵达', sub: '能否被看到' },
+  { name: '信任链', sub: '能否被采信' },
+  { name: '转发与留存', sub: '能否被记住' }
+];
+var gateBlocked = [false, false, false, false, false];
+
+var PIPE_NOTE = [
+  '停在「<b>发言资格</b>」——声音连被承认为「值得进入讨论」的机会都没有。它不一定被禁止，也可能只是被安排在不重要的位置：同一句话会被当作专业意见、当事人陈述、普通评论，还是无关噪声。',
+  '停在「<b>渠道入口</b>」——有资格说，却接不进任何一条能抵达受众的通道。渠道并不是一条中性的传送管道，接入也不只是「能够发布」，还包括发布在什么位置、能够停留多久、是否进入推荐。',
+  '停在「<b>抵达</b>」——发布只是内容进入系统，抵达才是内容真正出现在受众的认知范围内。<b>名义受众不等于实际受众</b>：一份文件被发送到所有成员，不代表所有成员都会阅读。',
+  '停在「<b>信任链</b>」——声音发得出、传得开，却不被当作可以用于判断的信息。此时沉默不再是可自主选择的策略，而只是没有声音。',
+  '停在「<b>转发与留存</b>」——能抵达，但不能被重复、被保存、被引用，影响无法累积。话语权的丧失也可能发展为认知消除：缺少回应的版本逐渐固定，缺少记录的经验逐渐消失。',
+  '<b>五道闸门全开</b>——声音进入渠道、抵达受众、获得采信并继续流动。这才是话语权：不是能不能说话，而是这条链条能运转到什么程度。'
+];
+
+function renderPipe(){
+  var track = document.getElementById('pipeTrack');
+  var note = document.getElementById('pipeNote');
+  if (!track) return;
+
+  var firstBlocked = -1;
+  for (var i = 0; i < gateBlocked.length; i++){
+    if (gateBlocked[i]){ firstBlocked = i; break; }
+  }
+
+  track.innerHTML = '';
+  var a = document.createElement('div');
+  a.className = 'end';
+  a.textContent = '声音';
+  track.appendChild(a);
+
+  GATES.forEach(function(g, i){
+    var b = document.createElement('button');
+    var cls = 'gate';
+    if (i === firstBlocked) cls += ' blocked';
+    else if (firstBlocked >= 0 && i > firstBlocked) cls += ' dim';
+    else cls += ' lit';
+    b.className = cls;
+    b.innerHTML = '<span class="gn">闸门 0' + (i + 1) + '</span>' +
+                  '<span class="gt">' + g.name + '</span>' +
+                  '<span class="gs">' + (i === firstBlocked ? '受阻' : (firstBlocked >= 0 && i > firstBlocked ? '未及' : '通过')) + '</span>';
+    b.onclick = function(){ gateBlocked[i] = !gateBlocked[i]; renderPipe(); };
+    track.appendChild(b);
+  });
+
+  var z = document.createElement('div');
+  z.className = 'end';
+  z.textContent = '受众认知';
+  track.appendChild(z);
+
+  if (note) note.innerHTML = PIPE_NOTE[firstBlocked < 0 ? 5 : firstBlocked];
+}
+
+/* ============================================================
+   交互 04 · 三权状态机
+   ============================================================ */
+var SM = {
+  '100': { tag: '单权状态', title: '仅掌握定义权', color: 'var(--def)',
+    can: '创造名称、建立分类、划定边界',
+    stuck: '无法保证概念被广泛使用，也无法决定概念最终获得什么意义',
+    state: '有概念，却没有扩散和定论',
+    foot: '单权状态并非毫无影响——它能让局部发生变化，却难以独自完成从对象生成到意义定型的全过程。此时主体通常会主动寻找第二项能力：<b>定义者寻找渠道。</b>' },
+
+  '010': { tag: '单权状态', title: '仅掌握解释权', color: 'var(--exp)',
+    can: '组织因果、分配责任、对事件作出裁决',
+    stuck: '未必能够决定讨论对象如何命名，也没有能力保证自己的版本抵达受众',
+    state: '有裁决，却没有起点和渠道',
+    foot: '如果定义权掌握在其他主体手中，解释者可能始终在别人设定的概念中作答。解释权在组织、司法和专业领域中可以依靠程序形成强制效果，但一旦离开这些场域，它仍然需要定义和传播提供支撑。' },
+
+  '001': { tag: '单权状态', title: '仅掌握话语权', color: 'var(--dis)',
+    can: '拥有渠道、频次和覆盖范围，可以制造巨大可见性',
+    stuck: '没有能力生产自己的概念，也无法让传播内容形成稳定意义',
+    state: '有渠道，却没有自己的概念和结局',
+    foot: '它可以反复讨论某个对象，却始终使用别人提供的名称；可以扩大某种情绪，却不能说明情绪应当指向什么原因和责任。<b>话语权能够制造注意，却不能自动把注意转化为认知秩序。</b>' },
+
+  '110': { tag: '两权主导', title: '定义权 ＋ 解释权', color: 'var(--def)',
+    can: '同时控制认知起点与意义终点：先决定对象是什么，再依据同一套分类和标准组织因果与责任',
+    stuck: '缺少外部扩散——如果话语渠道掌握在竞争者手中，正式定义与解释可能在制度内部有效，在公共认知中却处于弱势',
+    state: '意义封闭',
+    foot: '定义为解释规定对象，解释又反过来证明定义正确，二者容易形成意义上的封闭结构。这种组合在法律、行政、专业组织和封闭群体中尤其有效，因为场域本身可以把定义和解释直接写入记录和程序。' },
+
+  '101': { tag: '两权主导', title: '定义权 ＋ 话语权', color: 'var(--dis)',
+    can: '议题占位：制造概念，也能通过渠道和频次把概念铺成默认认识',
+    stuck: '缺乏解释收束能力——概念可以得到普及，意义却可能被对手重新占据',
+    state: '议题占位',
+    foot: '受众可能尚未接受某种解释，却已经习惯用掌握者提供的名称讨论问题。反对者即使提出不同结论，也必须先处理这个名称及其边界。<b>这种组合特别适合认知竞争的启动与扩张阶段。</b>' },
+
+  '011': { tag: '两权主导', title: '解释权 ＋ 话语权', color: 'var(--exp)',
+    can: '把一套完整意义持续送入受众，在事件发生后迅速形成主要版本',
+    stuck: '解释可能仍然被困在别人建立的概念中——如果对象的名称、分类和边界由对手决定，掌握者就可能始终在回答对方提出的问题',
+    state: '快速定型',
+    foot: '这种组合在舆论竞争、危机定性和社会动员中具有明显优势。它也有一条长期的侵蚀路径：当一种解释持续改变旧概念的使用方式，原有名称可能被重新赋义，最终迫使社会接受新的分类。' },
+
+  '111': { tag: '闭环控制', title: '三权齐备', color: 'var(--ink-2)',
+    can: '决定对象是什么、说明它意味着什么，并把这套认识持续送入受众',
+    stuck: '协调成本高，且三项功能共用同一份信用储备——定义被证伪，此前基于该定义的传播内容全部需要重新评估',
+    state: '最强，也最脆弱',
+    foot: '闭环控制不等于对所有人的思想进行绝对控制。集中带来单点失效：三权分散时，一个环节出问题，另外两个仍可支撑局面；三权集中时，问题的暴露路径同时也是整个结构的暴露路径。<b>这也是集中结构往往在长期表现更好、在一次冲击后表现更差的原因。</b>' },
+
+  '000': { tag: '三权尽失', title: '认知消灭', color: 'var(--danger)',
+    can: '仍然可以在物理意义上存在，也可以继续行动和发言',
+    stuck: '无法决定自己以什么身份出现，无法组织自身经历的因果与意义，也无法把自己的版本送到目标受众面前',
+    state: '从行动者变成被说明的对象',
+    foot: '所谓认知消灭并不是物理消灭，也不只是暂时无人关注——它指的是一个主体逐渐失去以自己的名称、意义和声音存在于共同认知中的能力。这种状态具有范围：一个群体可以在公共空间中失去三权，却在内部关系和私人记录中保存自身定义。<b>重新进入认知秩序，往往需要先夺回一个立足点，再取得第二项能力或与其他主体形成稳定联盟。</b>' }
+};
+
+var swState = { def: true, exp: false, dis: false };
+
+function toggleSw(key){
+  swState[key] = !swState[key];
+  renderSM();
+}
+
+function renderSM(){
+  var ids = { def: 'swDef', exp: 'swExp', dis: 'swDis' };
+  Object.keys(ids).forEach(function(k){
+    var el = document.getElementById(ids[k]);
+    if (el) el.classList.toggle('on', swState[k]);
+  });
+
+  var key = (swState.def ? '1' : '0') + (swState.exp ? '1' : '0') + (swState.dis ? '1' : '0');
+  var d = SM[key];
+  if (!d) return;
+
+  var tag = document.getElementById('smTag');
+  var title = document.getElementById('smTitle');
+  var can = document.getElementById('smCan');
+  var stuck = document.getElementById('smStuck');
+  var state = document.getElementById('smState');
+  var foot = document.getElementById('smFoot');
+
+  if (tag){ tag.textContent = d.tag; tag.style.setProperty('--pc', d.color); }
+  if (title) title.textContent = d.title;
+  if (can) can.textContent = d.can;
+  if (stuck) stuck.textContent = d.stuck;
+  if (state) state.textContent = d.state;
+  if (foot) foot.innerHTML = d.foot;
+}
+
+/* ============================================================
+   交互 05 · 解释债务时钟
+   ============================================================ */
+function updateDebt(){
+  var range = document.getElementById('debtRange');
+  if (!range) return;
+  var v = parseInt(range.value, 10) || 0;
+
+  var debtBar = document.getElementById('debtBar');
+  var visBar = document.getElementById('visBar');
+  var debtVal = document.getElementById('debtVal');
+  var visVal = document.getElementById('visVal');
+  var zone = document.getElementById('debtZone');
+  var rev = document.getElementById('debtReversal');
+  var note = document.getElementById('debtNote');
+
+  /* 可见性：上升快、后段趋饱和；债务线性累积 —— 两者在末段交叉 */
+  var vis = Math.round(100 * (1 - Math.exp(-v / 28)));
+
+  if (debtBar) debtBar.style.width = v + '%';
+  if (visBar) visBar.style.width = vis + '%';
+  if (debtVal) debtVal.textContent = v + ' / 100';
+  if (visVal) visVal.textContent = vis + ' / 100';
+
+  var hot = false;
+  var text = '';
+  if (v < 30){
+    text = '阶段 · <b>留有余地</b>　说法中保留修正空间，出现新事实时能够修改而不必推翻整体。明确的边界、具体的适用范围、对例外的事先承认，都会降低债务的累积速度。';
+  } else if (v < 60){
+    text = '阶段 · <b>逐渐收紧</b>　越具体、越绝对、越强调统一的说法，短期说服力越强，留下的义务也越重。<b>债务的规模，与定义和解释的封闭程度成正比。</b>';
+  } else if (v < 85){
+    text = '阶段 · <b>潜伏期</b>　从承诺作出到被要求兑付之间，正是可见性增长最快的阶段。这构成了一个诱人的错觉：<b>遵循同一套说法的投入越多，效果看起来越好</b>，而债务只在被兑付时才出现。许多主体正是在效果最好的时期把说法收得最紧。';
+  } else {
+    hot = true;
+    text = '临界 · <b>账户透支</b>　长期操作的累计落差被一次性组织起来。组织它的往往不是操作者，而是操作者的对手，或者一个恰好提供框架的旁观者。<b>反噬因此常显得突然：在它发生的前一天，一切正常。</b>';
+  }
+
+  if (zone){
+    zone.innerHTML = text;
+    zone.classList.toggle('hot', hot);
+  }
+  if (rev) rev.classList.toggle('show', hot);
+
+  if (note){
+    note.innerHTML = v < 60
+      ? '反噬无法被技术性消除，因为它的根源在三权本身的运作方式中：<b>任何塑造认知的安排都会留下义务</b>。但它的规模可以被控制。'
+      : '降低反噬风险的四项条件：<b>可修正性 · 解释冗余 · 渠道分散 · 信用储备</b>。它们的共同点是——都降低短期效率。反噬的代价发生在未来，而准备的收益也在未来，主体在当下感受到的只是说服力的折扣。';
+  }
+}
+
+/* ============================================================
+   图版 · 三权与认知链（canvas 手绘）
+   ============================================================ */
+var PAL = {
+  bg: '#0b0f15',
+  hair: 'rgba(110,168,254,0.055)',
+  line: '#222c3a',
+  lineHi: '#3b4c62',
+  ink: '#e9eef7',
+  ink2: '#a2b0c6',
+  ink3: '#6b7b93',
+  ink4: '#4a5769',
+  center: '#8b9bb4',
+  def: '#6ea8fe',
+  exp: '#e0a458',
+  dis: '#45d9b0'
+};
+
+var atlas = document.getElementById('atlas');
+var actx = atlas ? atlas.getContext('2d') : null;
+
+var centerNode = { x: 480, y: 300, r: 46, label: '社会认知秩序', color: PAL.center, desc: '社会在特定时期内形成的认知排列：哪些对象能被看见，哪些名称可以被公开使用，哪些解释更容易获得信任。' };
+
+var DIMS = [
+  { id: 'def', label: '定义权', x: 220, y: 205, r: 38, color: PAL.def, base: 2.79, arc: 1.5, dist: 148,
+    desc: '使某种命名、分类、边界或判断标准，成为他人认识对象时优先依据的能力。',
+    subs: [
+      { label: '命名', desc: '从复杂对象中提取部分特征，再用一个名称把这些特征集中起来，把复杂现实转化为可识别的对象。' },
+      { label: '分类划界', desc: '决定对象应当与哪些对象放在一起、谁属于其中、谁被排除，并为边界两侧安排不同后果。' },
+      { label: '标准跑道', desc: '抽象概念被转换为可观察的指标，指标被赋予权重，判断便沿着预设方向运行。标准规定了什么值得被测量。' },
+      { label: '认知压缩', desc: '被选中的特征成为对象的代表，其余事实被视为次要内容或无关信息。定义权的影响在于安排注意力，并把认知成本分配给各方。' },
+      { label: '定义闭合', desc: '先为对象确定性质，再根据这一性质解释它的一切表现，最后用表现反过来证明最初定义。对象越试图摆脱，越被认为符合预期。' },
+      { label: '概念重置', desc: '当现实中出现无法被原定义容纳的对象时，需要重新提取特征、建立分类、划出可执行边界，并提供能进入判断的标准。' }
+    ],
+    rels: [[0,1,'归属'],[1,2,'约束'],[4,5,'破裂']] },
+
+  { id: 'dis', label: '话语权', x: 740, y: 205, r: 38, color: PAL.dis, base: -0.35, arc: 1.5, dist: 148,
+    desc: '使自己的定义、解释和主张抵达特定受众，并获得注意、采信和继续传播的能力。',
+    subs: [
+      { label: '发言资格', desc: '决定谁可以在什么场合说话，也决定同一句话会被当作专业意见、当事人陈述、普通评论还是无关噪声。' },
+      { label: '渠道入口', desc: '接入渠道不只是能够发布，还包括发布在什么位置、能够停留多久、是否进入推荐、能否抵达关键节点。' },
+      { label: '抵达频次', desc: '发布只是内容进入系统，抵达才是内容真正出现在受众的认知范围内。音量不等于话语权。' },
+      { label: '信任链', desc: '受众无法核查每一项数据，只能借助来源信誉降低判断成本。转发把自己的信用附加到内容上，同时也改写内容。' },
+      { label: '跨群体编码', desc: '越过圈层需要把圈内语言转换为圈外可理解的概念，并依靠桥接节点。覆盖扩大可能同时削弱原本的诉求。' },
+      { label: '话语排除', desc: '最深的排除是让某些人的话天然不被算作证据。它不表现为公开禁止，而表现为一连串看似独立的筛选。' }
+    ],
+    rels: [[0,1,'门槛'],[1,2,'管道'],[3,4,'桥接']] },
+
+  { id: 'exp', label: '解释权', x: 480, y: 510, r: 38, color: PAL.exp, base: 1.571, arc: 1.5, dist: 148,
+    desc: '使自己的因果组织、责任判断和意义说明，成为他人理解事实时优先依据的能力。',
+    subs: [
+      { label: '选择连接', desc: '决定什么材料值得进入说明，再把不同事实连接起来，建立先后、因果和主次关系。' },
+      { label: '因果起点', desc: '因果链从哪里开始，决定哪些内容被看作原因，哪些只能成为结果；也决定哪些主体进入责任范围。' },
+      { label: '责任分配', desc: '一个因素参与结果的形成，不代表相关主体必然承担同等责任。还要考虑是否知道风险、是否有能力改变、是否获益。' },
+      { label: '证据资格', desc: '材料能否在某套解释秩序中产生证明作用，与它客观上是否存在无关。解释权通过规定事实必须以什么形式出现来控制入口。' },
+      { label: '第一解释', desc: '最早完成有效组织的一方为后续信息建立框架。它不一定最准确，却让后来者承担拆解旧框架的额外成本。' },
+      { label: '解释吸收', desc: '强势解释为反对行为预先安排位置：辩解成为掩饰，反击成为失控，拒绝参与成为缺乏依据。' }
+    ],
+    rels: [[0,1,'排序'],[1,2,'归因'],[4,5,'固化']] }
+];
+
+/* 跨维接力弧线 */
+var RELAY = [
+  { from: 'def', to: 'dis', ctrl: [480, 150], label: '① 铺开', lx: 480, ly: 156 },
+  { from: 'dis', to: 'exp', ctrl: [651, 375], label: '② 收束', lx: 678, ly: 388 },
+  { from: 'exp', to: 'def', ctrl: [309, 376], label: '③ 反哺', lx: 282, ly: 388 }
+];
+
+var atlasPhase = 0;
+var expandedDim = null;
+var animP = 1, animDir = 0, animRaf = null;
+var hovered = null, popup = null;
+
+function dimById(id){
+  for (var i = 0; i < DIMS.length; i++) if (DIMS[i].id === id) return DIMS[i];
+  return null;
+}
+
+function subPos(dim, idx, p){
+  var n = dim.subs.length;
+  var a = dim.base - dim.arc / 2 + (n > 1 ? (idx / (n - 1)) * dim.arc : 0);
+  var d = dim.dist * p;
+  return { x: dim.x + Math.cos(a) * d, y: dim.y + Math.sin(a) * d, a: a };
+}
+
+function rr(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function glow(ctx, x, y, r, color, alpha){
+  var g = ctx.createRadialGradient(x, y, 0, x, y, r);
+  g.addColorStop(0, hexA(color, alpha));
+  g.addColorStop(1, hexA(color, 0));
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function hexA(hex, a){
+  var n = parseInt(hex.slice(1), 16);
+  return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
+}
+
+function qPoint(p0, c, p1, t){
+  var mt = 1 - t;
+  return {
+    x: mt * mt * p0.x + 2 * mt * t * c.x + t * t * p1.x,
+    y: mt * mt * p0.y + 2 * mt * t * c.y + t * t * p1.y
+  };
+}
+
+function drawLabelPlate(ctx, x, y, text, color, align){
+  ctx.save();
+  ctx.font = '13px -apple-system,"PingFang SC","Noto Sans SC",sans-serif';
+  var w = ctx.measureText(text).width + 22;
+  var h = 28;
+  var lx = align === 'center' ? x - w / 2 : x;
+  if (lx < 6) lx = 6;
+  if (lx + w > atlas.width - 6) lx = atlas.width - 6 - w;
+  ctx.fillStyle = 'rgba(15,20,28,0.92)';
+  ctx.strokeStyle = 'rgba(59,76,98,0.55)';
+  ctx.lineWidth = 1;
+  rr(ctx, lx, y - h / 2, w, h, 6);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = color;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, lx + w / 2, y);
+  ctx.restore();
+}
+
+function drawNode(ctx, x, y, r, color, label, isHover){
+  if (isHover) glow(ctx, x, y, r + 20, color, 0.28);
+  ctx.save();
+  ctx.shadowColor = isHover ? hexA(color, 0.55) : 'rgba(0,0,0,0.5)';
+  ctx.shadowBlur = isHover ? 26 : 12;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  ctx.save();
+  ctx.fillStyle = 'rgba(10,13,18,0.92)';
+  ctx.font = 'bold 14px -apple-system,"PingFang SC","Noto Sans SC",sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, x, y + 1);
+  ctx.restore();
+}
+
+function drawSubNode(ctx, x, y, color, label, isHover, labelAbove){
+  if (isHover) glow(ctx, x, y, 22, color, 0.34);
+  ctx.save();
+  ctx.shadowColor = hexA(color, isHover ? 0.8 : 0.35);
+  ctx.shadowBlur = isHover ? 18 : 8;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(x, y, isHover ? 9 : 7, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  drawLabelPlate(ctx, x, y + (labelAbove ? -30 : 30), label, isHover ? color : PAL.ink2, 'center');
+}
+
+function drawUniverse(){
+  if (!actx || !atlas) return;
+  var ctx = actx;
+  var W = atlas.width, H = atlas.height;
+
+  /* 背景 + 网格 */
+  ctx.fillStyle = PAL.bg;
+  ctx.fillRect(0, 0, W, H);
+  ctx.save();
+  ctx.strokeStyle = PAL.hair;
+  ctx.lineWidth = 1;
+  for (var gx = 60; gx < W; gx += 60){
+    ctx.beginPath(); ctx.moveTo(gx + 0.5, 0); ctx.lineTo(gx + 0.5, H); ctx.stroke();
+  }
+  for (var gy = 60; gy < H; gy += 60){
+    ctx.beginPath(); ctx.moveTo(0, gy + 0.5); ctx.lineTo(W, gy + 0.5); ctx.stroke();
+  }
+  ctx.restore();
+
+  var ep = Math.max(0, Math.min(1, atlasPhase));
+  var cAlpha = Math.min(1, ep / 0.3);
+  var lAlpha = Math.min(1, Math.max(0, ep - 0.12) / 0.3);
+
+  /* 中心 → 维度 发丝线 */
+  ctx.save();
+  ctx.globalAlpha = lAlpha;
+  ctx.strokeStyle = PAL.line;
+  ctx.lineWidth = 1;
+  for (var i = 0; i < DIMS.length; i++){
+    ctx.beginPath();
+    ctx.moveTo(centerNode.x, centerNode.y);
+    ctx.lineTo(DIMS[i].x, DIMS[i].y);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  /* 接力弧线 */
+  ctx.save();
+  ctx.globalAlpha = lAlpha;
+  for (var r = 0; r < RELAY.length; r++){
+    var rl = RELAY[r];
+    var p0 = dimById(rl.from), p1 = dimById(rl.to);
+    var c = { x: rl.ctrl[0], y: rl.ctrl[1] };
+    ctx.strokeStyle = hexA(PAL.lineHi, 0.85);
+    ctx.lineWidth = 1.4;
+    ctx.setLineDash([7, 6]);
+    ctx.beginPath();
+    ctx.moveTo(p0.x, p0.y);
+    ctx.quadraticCurveTo(c.x, c.y, p1.x, p1.y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    /* 箭头（在 t=0.5 处，方向 = p1 - p0） */
+    var mid = qPoint(p0, c, p1, 0.5);
+    var dx = p1.x - p0.x, dy = p1.y - p0.y;
+    var len = Math.sqrt(dx * dx + dy * dy) || 1;
+    var ux = dx / len, uy = dy / len;
+    ctx.fillStyle = hexA(PAL.ink2, 0.75);
+    ctx.beginPath();
+    ctx.moveTo(mid.x + ux * 7 - uy * 4.6, mid.y + uy * 7 + ux * 4.6);
+    ctx.lineTo(mid.x - ux * 4, mid.y - uy * 4);
+    ctx.lineTo(mid.x + ux * 7 + uy * 4.6, mid.y + uy * 7 - ux * 4.6);
+    ctx.closePath();
+    ctx.fill();
+
+    /* 弧线标签 */
+    ctx.fillStyle = hexA(PAL.ink3, 0.95);
+    ctx.font = '11px ui-monospace,Consolas,monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(rl.label, rl.lx, rl.ly);
+  }
+  ctx.restore();
+
+  /* 维度节点 */
+  var anyExpanded = expandedDim !== null && animP > 0.1;
+  for (var d = 0; d < DIMS.length; d++){
+    var dim = DIMS[d];
+    var active = (dim.id === expandedDim);
+    var alpha = (anyExpanded && !active ? 0.3 : 1) * lAlpha;
+    var isHover = hovered && hovered.type === 'dim' && hovered.ref === dim;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    drawNode(ctx, dim.x, dim.y, dim.r, dim.color, dim.label, isHover);
+    ctx.restore();
+  }
+
+  /* 子概念 */
+  var activeDim = expandedDim ? dimById(expandedDim) : null;
+  if (activeDim && animP > 0){
+    var labelAbove = activeDim.y > 330;
+    for (var s = 0; s < activeDim.subs.length; s++){
+      var pos = subPos(activeDim, s, animP);
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, animP * 1.6);
+      ctx.strokeStyle = hexA(activeDim.color, 0.30);
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 5]);
+      ctx.beginPath();
+      ctx.moveTo(activeDim.x, activeDim.y);
+      ctx.lineTo(pos.x, pos.y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+    }
+    /* 子概念之间的关系 */
+    if (activeDim.rels && animP > 0.35){
+      var rp = (animP - 0.35) / 0.65;
+      for (var q = 0; q < activeDim.rels.length; q++){
+        var rel = activeDim.rels[q];
+        var pa = subPos(activeDim, rel[0], animP);
+        var pb = subPos(activeDim, rel[1], animP);
+        ctx.save();
+        ctx.globalAlpha = 0.42 * rp;
+        ctx.strokeStyle = hexA(activeDim.color, 0.9);
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(pa.x, pa.y);
+        ctx.lineTo(pb.x, pb.y);
+        ctx.stroke();
+        var mx = (pa.x + pb.x) / 2, my = (pa.y + pb.y) / 2;
+        ctx.globalAlpha = 0.8 * rp;
+        ctx.fillStyle = PAL.ink3;
+        ctx.font = '10.5px ui-monospace,Consolas,monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(rel[2], mx, my - 11);
+        ctx.restore();
+      }
+    }
+    for (var t = 0; t < activeDim.subs.length; t++){
+      var sp = subPos(activeDim, t, animP);
+      var sub = activeDim.subs[t];
+      var isH = hovered && hovered.type === 'sub' && hovered.ref === sub;
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, animP * 2);
+      drawSubNode(ctx, sp.x, sp.y, activeDim.color, sub.label, isH, labelAbove);
+      ctx.restore();
+    }
+  }
+
+  /* 中心节点 */
+  ctx.save();
+  ctx.globalAlpha = cAlpha;
+  ctx.translate(centerNode.x, centerNode.y);
+  var cs = Math.min(1, ep / 0.35) * 0.25 + 0.75;
+  ctx.scale(cs, cs);
+  ctx.translate(-centerNode.x, -centerNode.y);
+  var isCH = hovered && hovered.type === 'center';
+  drawNode(ctx, centerNode.x, centerNode.y, centerNode.r, centerNode.color, centerNode.label, isCH);
+  ctx.restore();
+
+  /* hover 提示条 */
+  if (hovered){
+    var text = hovered.type === 'center' ? centerNode.desc : hovered.ref.desc;
+    if (text){
+      ctx.save();
+      ctx.font = '12.5px -apple-system,"PingFang SC","Noto Sans SC",sans-serif';
+      var tw = ctx.measureText(text).width + 22;
+      var th = 32;
+      var tx = Math.max(10, Math.min(W - tw - 10, hovered.x - tw / 2));
+      var ty = hovered.y - 56;
+      if (ty < 10) ty = hovered.y + 52;
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowBlur = 16;
+      ctx.fillStyle = 'rgba(19,26,35,0.97)';
+      ctx.strokeStyle = PAL.lineHi;
+      ctx.lineWidth = 1;
+      rr(ctx, tx, ty, tw, th, 6);
+      ctx.fill();
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = PAL.ink2;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, tx + tw / 2, ty + th / 2);
+      ctx.restore();
+    }
+  }
+
+  /* 点击详情卡 */
+  if (popup){
+    var pd = popup.dim;
+    var ps = popup.sub;
+    ctx.save();
+    ctx.font = 'bold 15px -apple-system,"PingFang SC","Noto Sans SC",sans-serif';
+    var titleW = ctx.measureText(ps.label).width;
+    ctx.font = '13px -apple-system,"PingFang SC","Noto Sans SC",sans-serif';
+    var maxW = 330, lines = [], rest = ps.desc;
+    while (rest.length > 0){
+      var cut = rest.length;
+      for (var ci = rest.length; ci > 0; ci--){
+        if (ctx.measureText(rest.slice(0, ci)).width <= maxW || ci === 1){ cut = ci; break; }
+      }
+      lines.push(rest.slice(0, cut));
+      rest = rest.slice(cut);
+    }
+    var cardW = Math.max(titleW + 60, 350);
+    var lineH = 23;
+    var cardH = 62 + lines.length * lineH + 34;
+    var cx = Math.max(12, Math.min(W - cardW - 12, popup.x - cardW / 2));
+    var cy = popup.y - cardH - 34;
+    if (cy < 12) cy = popup.y + 40;
+    if (cy + cardH > H - 12) cy = H - 12 - cardH;
+
+    ctx.shadowColor = 'rgba(0,0,0,0.6)';
+    ctx.shadowBlur = 28;
+    ctx.fillStyle = '#141c26';
+    ctx.strokeStyle = pd.color;
+    ctx.lineWidth = 1;
+    rr(ctx, cx, cy, cardW, cardH, 8);
+    ctx.fill();
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = pd.color;
+    rr(ctx, cx, cy, cardW, 3, 8);
+    ctx.fill();
+    ctx.fillRect(cx, cy + 1, cardW, 2);
+
+    ctx.fillStyle = PAL.ink;
+    ctx.font = 'bold 15px -apple-system,"PingFang SC","Noto Sans SC",sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(ps.label, cx + 20, cy + 30);
+
+    ctx.fillStyle = pd.color;
+    ctx.font = '10.5px ui-monospace,Consolas,monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(pd.label, cx + cardW - 20, cy + 30);
+
+    ctx.fillStyle = PAL.ink2;
+    ctx.font = '12.8px -apple-system,"PingFang SC","Noto Sans SC",sans-serif';
+    ctx.textAlign = 'left';
+    for (var li = 0; li < lines.length; li++){
+      ctx.fillText(lines[li], cx + 20, cy + 62 + li * lineH);
+    }
+
+    ctx.fillStyle = PAL.ink4;
+    ctx.font = '10.5px ui-monospace,Consolas,monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('点击任意位置关闭', cx + cardW / 2, cy + cardH - 16);
+    ctx.restore();
+  }
+}
+
+function startExpand(id){
+  if (expandedDim === id){
+    animDir = -1;
+    expandedDim = null;
+  } else {
+    expandedDim = id;
+    animDir = 1;
+    animP = 0;
+  }
+  popup = null;
+  if (animRaf) cancelAnimationFrame(animRaf);
+  stepAnim();
+}
+
+function stepAnim(){
+  var step = 0.075;
+  if (animDir > 0){
+    animP = Math.min(1, animP + step);
+    drawUniverse();
+    if (animP < 1){ animRaf = requestAnimationFrame(stepAnim); }
+    else { animDir = 0; animRaf = null; }
+  } else if (animDir < 0){
+    animP = Math.max(0, animP - step * 1.3);
+    drawUniverse();
+    if (animP > 0){ animRaf = requestAnimationFrame(stepAnim); }
+    else { animDir = 0; animRaf = null; }
+  }
+}
+
+function canvasPos(e){
+  var rect = atlas.getBoundingClientRect();
+  var sx = atlas.width / rect.width;
+  var sy = atlas.height / rect.height;
+  var client = e.touches && e.touches[0] ? e.touches[0] : e;
+  return { x: (client.clientX - rect.left) * sx, y: (client.clientY - rect.top) * sy };
+}
+
+function hitDim(mx, my){
+  for (var i = 0; i < DIMS.length; i++){
+    var d = DIMS[i];
+    var dx = mx - d.x, dy = my - d.y;
+    if (dx * dx + dy * dy <= (d.r + 8) * (d.r + 8)) return d;
+  }
+  var cx = mx - centerNode.x, cy = my - centerNode.y;
+  if (cx * cx + cy * cy <= (centerNode.r + 8) * (centerNode.r + 8)) return centerNode;
+  return null;
+}
+
+function hitSub(mx, my, dim, p){
+  if (!dim || p < 0.35) return null;
+  for (var i = 0; i < dim.subs.length; i++){
+    var pos = subPos(dim, i, p);
+    var dx = mx - pos.x, dy = my - pos.y;
+    if (dx * dx + dy * dy <= 22 * 22) return dim.subs[i];
+  }
+  return null;
+}
+
+if (atlas){
+  atlas.addEventListener('mousemove', function(e){
+    var m = canvasPos(e);
+    var found = null;
+    if (expandedDim && animP > 0.6){
+      var d0 = dimById(expandedDim);
+      var sb = hitSub(m.x, m.y, d0, animP);
+      if (sb){
+        var pp = subPos(d0, d0.subs.indexOf(sb), animP);
+        found = { type: 'sub', ref: sb, x: pp.x, y: pp.y };
+      }
+    }
+    if (!found){
+      var hit = hitDim(m.x, m.y);
+      if (hit){
+        found = (hit === centerNode)
+          ? { type: 'center', ref: hit, x: hit.x, y: hit.y }
+          : { type: 'dim', ref: hit, x: hit.x, y: hit.y };
+      }
+    }
+    var changed = (found && !hovered) || (!found && hovered) || (found && hovered && found.ref !== hovered.ref);
+    if (changed){
+      hovered = found;
+      atlas.style.cursor = found ? 'pointer' : 'default';
+      drawUniverse();
+    }
+  });
+
+  atlas.addEventListener('mouseleave', function(){
+    if (hovered){ hovered = null; drawUniverse(); }
+  });
+
+  function atlasTap(e){
+    var m = canvasPos(e);
+    if (popup){ popup = null; drawUniverse(); return; }
+    if (expandedDim && animP > 0.8){
+      var d0 = dimById(expandedDim);
+      var sb = hitSub(m.x, m.y, d0, animP);
+      if (sb){
+        var pp = subPos(d0, d0.subs.indexOf(sb), animP);
+        popup = { sub: sb, dim: d0, x: pp.x, y: pp.y };
+        drawUniverse();
+        return;
+      }
+    }
+    var hit = hitDim(m.x, m.y);
+    if (!hit || hit === centerNode){
+      if (expandedDim){
+        animDir = -1;
+        expandedDim = null;
+        if (animRaf) cancelAnimationFrame(animRaf);
+        stepAnim();
+      }
+      return;
+    }
+    startExpand(hit.id);
+  }
+
+  atlas.addEventListener('click', atlasTap);
+  atlas.addEventListener('touchstart', function(e){
+    e.preventDefault();
+    atlasTap(e);
+  }, { passive: false });
+}
+
+/* 入场动画 */
+function stepEntrance(){
+  atlasPhase = Math.min(1, atlasPhase + 0.035);
+  drawUniverse();
+  if (atlasPhase >= 1) clearInterval(entranceTimer);
+}
+var entranceTimer = null;
+
+/* ---------- 启动 ---------- */
+(function init(){
+  renderClosure();
+  renderCausal();
+  renderPipe();
+  renderSM();
+  updateDebt();
+
+  var cr = document.getElementById('causalRange');
+  if (cr) cr.addEventListener('input', renderCausal);
+
+  var dr = document.getElementById('debtRange');
+  if (dr) dr.addEventListener('input', updateDebt);
+
+  if (atlas){
+    drawUniverse();
+    setTimeout(function(){
+      if (!entranceTimer) entranceTimer = setInterval(stepEntrance, 28);
+    }, 380);
+  }
+
+  var rt;
+  window.addEventListener('resize', function(){
+    clearTimeout(rt);
+    rt = setTimeout(function(){ if (atlas) drawUniverse(); }, 160);
+  });
+})();
+</script>
+
+</body>
+</html>
