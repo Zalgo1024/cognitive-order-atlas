@@ -259,10 +259,11 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
   margin-bottom:22px;
 }
 .hero-title .tw{ white-space:nowrap; }
-.hero-title .c-def{ color:var(--def); }
-.hero-title .c-exp{ color:var(--exp); }
-.hero-title .c-dis{ color:var(--dis); }
-.hero-title .dot{ color:var(--ink-4); font-weight:400; margin:0 .18em; }
+/* 第二十轮：标题去色，三词统一为墨色，只靠字重与间距建立层级（更克制、更"印刷感"） */
+.hero-title .c-def,
+.hero-title .c-exp,
+.hero-title .c-dis{ color:var(--ink); }
+.hero-title .dot{ color:var(--ink-4); font-weight:400; margin:0 .22em; }
 .hero-sub{
   font-size:clamp(calc(15px*var(--fs-scale)), 1.7vw, calc(18px*var(--fs-scale)));
   color:var(--ink-2); line-height:1.9; margin-bottom:10px;
@@ -511,13 +512,14 @@ canvas#atlas{ display:block; width:100%; height:auto; cursor:pointer; touch-acti
 .foot a{ color:var(--ink-3); border-bottom:1px solid var(--line-hi); }
 .foot a:hover{ color:var(--ink); }
 .foot .sep{ margin:0 9px; opacity:.5; }
-/* 页脚授权链接：虚线底边暗示「可展开说明」，但仍保持链接外观 */
-.foot a[data-tip]{ border-bottom:1px dashed var(--def); }
-.foot a[data-tip]:hover,
-.foot a[data-tip]:focus-visible{
+/* 页脚授权词条：第二十轮起它不再是链接（跳转入口已移进浮层内部），
+   改为"可悬停展开说明"的触发器 —— 去掉 cursor:pointer 与跳转语义。 */
+.foot [data-tip]{ cursor:help; }
+.foot [data-tip]:hover,
+.foot [data-tip]:focus-visible{
   color:var(--ink); background:var(--def-w); border-bottom-style:solid;
 }
-.foot a[data-tip]:focus-visible{ outline:2px solid var(--def); outline-offset:2px; border-radius:2px; }
+.foot [data-tip]:focus-visible{ outline:2px solid var(--def); outline-offset:2px; border-radius:2px; }
 
 /* ---------- 滚动显现 ---------- */
 /* rv = 滚动进入视口时淡入。pointer-events:none 保证「还没淡入的元素」不可点 ——
@@ -804,13 +806,38 @@ canvas#atlas{ display:block; width:100%; height:auto; cursor:pointer; touch-acti
 .term-pop.on{ opacity:1; transform:none; }
 .term-pop .tp-k{
   font-family:var(--mono); font-size:calc(11.5px*var(--fs-scale)); letter-spacing:.14em;
-  color:var(--ink-4); display:block; margin-bottom:7px;
+  color:var(--ink-4); display:block; margin-bottom:7px; padding-right:26px;  /* 让开右上角倒计时圈 */
 }
 .term-pop .tp-pl{
   font-size:calc(14.5px*var(--fs-scale)); font-weight:650; color:var(--def); line-height:1.6;
-  margin-bottom:8px;
+  margin-bottom:8px; padding-right:26px;
 }
 .term-pop .tp-d{ font-size:calc(12.5px*var(--fs-scale)); color:var(--ink-2); line-height:1.8; }
+/* ---------- 浮层 · 悬停固定（2026-10-05 第二十轮新增） ----------
+   交互：悬停 → 右上角倒计时圈走 5 秒 → 期间不移开则窗口钉住；
+   钉住后可点内部链接，点击窗口外任意处解除。未钉住时仍 pointer-events:none，
+   避免浮层遮住正文（保持老行为）。 */
+.term-pop.pin{ pointer-events:auto; border-color:var(--def);
+  box-shadow:0 16px 40px -12px rgba(0,0,0,.34), 0 0 0 1px var(--def); }
+/* 倒计时圈：右上角，纯 CSS 走 5s；钉住后停在满圈 */
+.tp-ring{ position:absolute; top:9px; right:9px; width:19px; height:19px; pointer-events:none; }
+.tp-ring circle{ fill:none; stroke-width:2; }
+.tp-ring .bg{ stroke:var(--line-hi); }
+.tp-ring .fg{
+  stroke:var(--def); stroke-linecap:round;
+  transform:rotate(-90deg); transform-origin:50% 50%;
+  animation:tpCountdown 5s linear forwards;
+}
+.term-pop.pin .tp-ring .fg{ animation-play-state:paused; }
+@keyframes tpCountdown{ from{ stroke-dashoffset:50.3; } to{ stroke-dashoffset:0; } }
+/* 窗口内跳转按钮（CC 协议等）：克制样式，不与正文链接争视觉 */
+.tp-go{
+  display:inline-block; margin-top:10px; padding:5px 11px;
+  border:1px solid var(--line-hi); border-radius:3px;
+  font-size:calc(12px*var(--fs-scale)); color:var(--ink-2);
+  transition:border-color .2s, background .2s, color .2s;
+}
+.tp-go:hover{ border-color:var(--def); color:var(--def); background:var(--def-w); }
 
 /* ---------- 移动端抽屉 ---------- */
 .scrim{ position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:130; opacity:0;
@@ -2187,10 +2214,10 @@ body.srch-on .rail-tree{ display:none; }
 
     <div class="fmark" style="margin-top:60px">展示页 · EXHIBIT</div>
     <p><strong style="color:var(--ink-2)">解释权 · 定义权 · 话语权　© 2026 by 李政恒 (Li Zhengheng)</strong>
-      is licensed under <a data-tip="cc-by-nc-sa" aria-label="CC BY-NC-SA 4.0 授权协议（署名 · 非商业性使用 · 相同方式共享）" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a><span class="sep">·</span>仅用于学习交流</p>
+      is licensed under <a data-tip="cc-by-nc-sa" role="button" tabindex="0" aria-label="CC BY-NC-SA 4.0 授权协议（署名 · 非商业性使用 · 相同方式共享）：查看说明">CC BY-NC-SA 4.0</a><span class="sep">·</span>仅用于学习交流</p>
     <p style="margin-top:12px;font-size:calc(12.5px*var(--fs-scale))">依据《解释权 · 定义权 · 话语权——社会认知秩序中的定义、解释与传播》整理</p>
     <p style="margin-top:10px;font-family:var(--mono);font-size:calc(11px*var(--fs-scale));color:var(--ink-4);letter-spacing:.08em"
-       title="如果你反馈的问题在最新版仍然存在，请把这个版本号一起发给维护者">页面版本 v2026.10.05-r7<span class="sep">·</span>看到旧版表现时请强制刷新（Ctrl+F5）</p>
+       title="如果你反馈的问题在最新版仍然存在，请把这个版本号一起发给维护者">页面版本 v2026.10.05-r8<span class="sep">·</span>看到旧版表现时请强制刷新（Ctrl+F5）</p>
   </div>
 </footer>
 
@@ -4987,7 +5014,9 @@ var TIPS = {
     d: '作者保留著作权，同时允许你自由复制、转发和改编这份内容。'
      + '条件是三条：<b>BY</b> 署名，转载或改编须标注原作者「李政恒 (Li Zhengheng)」；'
      + '<b>NC</b> 非商业性使用，不能用于商业目的；'
-     + '<b>SA</b> 相同方式共享，改编后的作品要用同一协议发布。'
+     + '<b>SA</b> 相同方式共享，改编后的作品要用同一协议发布。',
+    /* 跳转入口放进浮层内部（第二十轮）：词条本身不再直接跳走 */
+    link: { label: '查看协议全文', href: 'https://creativecommons.org/licenses/by-nc-sa/4.0/' }
   }
 };
 
@@ -4997,6 +5026,8 @@ function markTerms(){
   pop.setAttribute('role','tooltip');
   document.body.appendChild(pop);
   var cur = null;
+  var pinTimer = null;     /* 5 秒钉住计时器 */
+  var pinned = false;       /* 是否已钉住 */
 
   function place(btn){
     var r  = btn.getBoundingClientRect();
@@ -5025,12 +5056,12 @@ function markTerms(){
     pop.style.top  = (top  + sy) + 'px';
     pop.style.left = (left + sx) + 'px';
   }
-  /* 解析触发源 → 统一的 {k, pl, d}；不认识的返回 null */
+  /* 解析触发源 → 统一的 {k, pl, d, link}；不认识的返回 null */
   function resolve(btn){
     var tip = btn.getAttribute && btn.getAttribute('data-tip');
     if (tip){
       var g = TIPS[tip];
-      return g ? { k: g.k, pl: g.pl, d: g.d } : null;
+      return g ? { k: g.k, pl: g.pl, d: g.d, link: g.link } : null;
     }
     var key = btn.getAttribute('data-tk');
     var t = TERMS[key];
@@ -5039,17 +5070,39 @@ function markTerms(){
   function show(btn){
     var data = resolve(btn);
     if (!data) return;
-    pop.innerHTML = '<span class="tp-k">' + data.k + '</span>' +
-                    '<div class="tp-pl">' + data.pl + '</div>' +
-                    '<div class="tp-d">' + data.d + '</div>';
+    /* 倒计时圈：r=7.5 → 周长≈47.1；这里取 50.3 覆盖 stroke-linecap 两端，视觉无跳变 */
+    var html = '<svg class="tp-ring" viewBox="0 0 19 19" aria-hidden="true">' +
+               '<circle class="bg" cx="9.5" cy="9.5" r="7.5"/>' +
+               '<circle class="fg" cx="9.5" cy="9.5" r="7.5" stroke-dasharray="50.3" stroke-dashoffset="50.3"/>' +
+               '</svg>' +
+               '<span class="tp-k">' + data.k + '</span>' +
+               '<div class="tp-pl">' + data.pl + '</div>' +
+               '<div class="tp-d">' + data.d + '</div>';
+    if (data.link){
+      html += '<a class="tp-go" href="' + data.link.href + '" target="_blank" rel="noopener">' +
+              data.link.label + ' ↗</a>';
+    }
+    pop.innerHTML = html;
     place(btn);          /* 必须在 innerHTML 之后，才能量到真实尺寸 */
     pop.classList.add('on');
     cur = btn;
+    /* 重启 5 秒倒计时：CSS 动画靠重新插入节点自然重放 */
+    pinned = false;
+    pop.classList.remove('pin');
+    clearTimeout(pinTimer);
+    pinTimer = setTimeout(function(){
+      /* 只有指针仍停在触发源或浮层上，才算"不移开"→ 钉住 */
+      pinned = true;
+      pop.classList.add('pin');
+    }, 5000);
   }
   function hide(){
-    pop.classList.remove('on');
+    pop.classList.remove('on', 'pin');
     cur = null;
+    pinned = false;
+    clearTimeout(pinTimer);
   }
+  function unpin(){ if (pinned) hide(); }
 
   /* 只处理正文区的元素，跳过脚本、样式、canvas、组件壳与折叠区外 */
   var SKIP = { SCRIPT:1, STYLE:1, CANVAS:1, BUTTON:1, A:1, TEXTAREA:1, SELECT:1, OPTION:1 };
@@ -5095,16 +5148,28 @@ function markTerms(){
     if (b) show(b);
   });
   document.addEventListener('mouseout', function(e){
+    /* 钉住后不随移开消失；移回浮层自身（.tp-go 链接）也不隐藏 */
+    if (pinned) return;
+    var to = e.relatedTarget;
+    if (to && to.closest && to.closest('.term-pop')) return;
     var b = e.target.closest ? e.target.closest('.term,[data-tip]') : null;
     if (b && b === cur) hide();
+  });
+  /* 浮层内移动也算"仍在窗口上"：钉住后 pointer-events:auto，此时点内部链接不关闭 */
+  /* 点击窗口外任意处 → 解除固定并关闭（第二十轮需求） */
+  document.addEventListener('mousedown', function(e){
+    if (!pinned) return;
+    if (e.target === pop || pop.contains(e.target)) return;   /* 点窗口内部不关 */
+    hide();
   });
   document.addEventListener('focusin', function(e){
     var b = e.target.closest ? e.target.closest('.term,[data-tip]') : null;
     if (b) show(b);
   });
-  document.addEventListener('focusout', hide);
+  document.addEventListener('focusout', function(){ if (!pinned) hide(); });
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape') hide(); });
-  window.addEventListener('scroll', function(){ if (cur) place(cur); else hide(); }, { passive: true });
+  /* 滚动时：未钉住 → 跟随术语重新定位；已钉住 → 同样跟随（窗口留在原处，不凭空消失） */
+  window.addEventListener('scroll', function(){ if (cur) place(cur); }, { passive: true });
   window.addEventListener('resize', hide);
   return targets.length;
 }
