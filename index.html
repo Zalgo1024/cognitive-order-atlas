@@ -819,14 +819,15 @@ canvas#atlas{ display:block; width:100%; height:auto; cursor:pointer; touch-acti
    避免浮层遮住正文（保持老行为）。 */
 .term-pop.pin{ pointer-events:auto; border-color:var(--def);
   box-shadow:0 16px 40px -12px rgba(0,0,0,.34), 0 0 0 1px var(--def); }
-/* 倒计时圈：右上角，纯 CSS 走 5s；钉住后停在满圈 */
+/* 倒计时圈：右上角，纯 CSS 走 3s；钉住后停在满圈。
+   ⚠️ 时长必须与 markTerms() 里的 setTimeout(…, 3000) 一致，改一处就要改两处。 */
 .tp-ring{ position:absolute; top:9px; right:9px; width:19px; height:19px; pointer-events:none; }
 .tp-ring circle{ fill:none; stroke-width:2; }
 .tp-ring .bg{ stroke:var(--line-hi); }
 .tp-ring .fg{
   stroke:var(--def); stroke-linecap:round;
   transform:rotate(-90deg); transform-origin:50% 50%;
-  animation:tpCountdown 5s linear forwards;
+  animation:tpCountdown 3s linear forwards;
 }
 .term-pop.pin .tp-ring .fg{ animation-play-state:paused; }
 @keyframes tpCountdown{ from{ stroke-dashoffset:50.3; } to{ stroke-dashoffset:0; } }
@@ -2217,7 +2218,7 @@ body.srch-on .rail-tree{ display:none; }
       is licensed under <a data-tip="cc-by-nc-sa" role="button" tabindex="0" aria-label="CC BY-NC-SA 4.0 授权协议（署名 · 非商业性使用 · 相同方式共享）：查看说明">CC BY-NC-SA 4.0</a><span class="sep">·</span>仅用于学习交流</p>
     <p style="margin-top:12px;font-size:calc(12.5px*var(--fs-scale))">依据《解释权 · 定义权 · 话语权——社会认知秩序中的定义、解释与传播》整理</p>
     <p style="margin-top:10px;font-family:var(--mono);font-size:calc(11px*var(--fs-scale));color:var(--ink-4);letter-spacing:.08em"
-       title="如果你反馈的问题在最新版仍然存在，请把这个版本号一起发给维护者">页面版本 v2026.10.05-r8<span class="sep">·</span>看到旧版表现时请强制刷新（Ctrl+F5）</p>
+       title="如果你反馈的问题在最新版仍然存在，请把这个版本号一起发给维护者">页面版本 v2026.10.05-r9<span class="sep">·</span>看到旧版表现时请强制刷新（Ctrl+F5）</p>
   </div>
 </footer>
 
@@ -5086,15 +5087,15 @@ function markTerms(){
     place(btn);          /* 必须在 innerHTML 之后，才能量到真实尺寸 */
     pop.classList.add('on');
     cur = btn;
-    /* 重启 5 秒倒计时：CSS 动画靠重新插入节点自然重放 */
+    /* 重启倒计时：CSS 动画靠重新插入节点自然重放。
+       3000ms 必须与 CSS 里 .tp-ring .fg 的 animation-duration 一致 */
     pinned = false;
     pop.classList.remove('pin');
     clearTimeout(pinTimer);
     pinTimer = setTimeout(function(){
-      /* 只有指针仍停在触发源或浮层上，才算"不移开"→ 钉住 */
       pinned = true;
       pop.classList.add('pin');
-    }, 5000);
+    }, 3000);
   }
   function hide(){
     pop.classList.remove('on', 'pin');
