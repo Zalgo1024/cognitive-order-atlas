@@ -348,6 +348,9 @@ input[type=range]::-moz-range-thumb{
 .bar.a i{ background:linear-gradient(90deg,var(--exp),var(--danger)); }
 .bar.b i{ background:linear-gradient(90deg,var(--def),var(--dis)); }
 .bar.c i{ background:linear-gradient(90deg,var(--dis),var(--exp)); }
+/* acc-dis：组件把 --acc 设为自己的主色（debt/silence=--danger，rhythm=--dis）。
+   之前漏了这个变体，三个组件的仪表条从首版起就一直是透明的（"解释·债务 100/100"空条）。 */
+.bar.acc-dis i{ background:linear-gradient(90deg,var(--acc,var(--exp)),var(--danger)); }
 .sl-zone{ margin-top:12px; font-size:calc(12.8px*var(--fs-scale)); color:var(--ink-3); line-height:1.8; }
 .sl-zone b{ color:var(--acc,var(--exp)); font-weight:650; }
 .sl-zone.hot b{ color:var(--danger); }
@@ -1863,28 +1866,28 @@ body.srch-on .rail-tree{ display:none; }
         <title>反噬的三条回流路径及其严重度</title>
         <desc>沿原渠道回流损失传播能力，沿信任链回流损失信用储备，沿制度回流损失定义权与解释权的正式基础，严重度依次上升。</desc>
         <text class="dg-k" x="0" y="14" fill="var(--ink-4)">路径</text>
-        <text class="dg-k" x="240" y="14" fill="var(--ink-4)">严重度</text>
+        <text class="dg-k" x="320" y="14" fill="var(--ink-4)">严重度</text>
         <text class="dg-k" x="600" y="14" fill="var(--ink-4)">损失的是什么</text>
 
         <rect x="0" y="30" width="860" height="60" rx="4" fill="var(--surface)"/>
         <text class="dg-t" x="16" y="55" fill="var(--ink)" font-weight="650">沿原渠道回流</text>
         <text class="dg-s" x="16" y="76" fill="var(--ink-3)">曾经用于推广的渠道，同样适合推广反对的内容</text>
-        <rect x="240" y="52" width="300" height="12" rx="6" fill="var(--surface-3)"/>
-        <rect x="240" y="52" width="96" height="12" rx="6" fill="var(--dis)"/>
+        <rect x="320" y="52" width="260" height="12" rx="6" fill="var(--surface-3)"/>
+        <rect x="320" y="52" width="83" height="12" rx="6" fill="var(--dis)"/>
         <text class="dg-s" x="600" y="64" fill="var(--ink-2)">传播能力</text>
 
         <rect x="0" y="100" width="860" height="60" rx="4" fill="var(--surface)"/>
         <text class="dg-t" x="16" y="125" fill="var(--ink)" font-weight="650">沿信任链回流</text>
         <text class="dg-s" x="16" y="146" fill="var(--ink-3)">曾经转发过内容的中介，其信用同时受损</text>
-        <rect x="240" y="122" width="300" height="12" rx="6" fill="var(--surface-3)"/>
-        <rect x="240" y="122" width="200" height="12" rx="6" fill="var(--exp)"/>
+        <rect x="320" y="122" width="260" height="12" rx="6" fill="var(--surface-3)"/>
+        <rect x="320" y="122" width="173" height="12" rx="6" fill="var(--exp)"/>
         <text class="dg-s" x="600" y="134" fill="var(--ink-2)">信用储备</text>
 
         <rect x="0" y="170" width="860" height="60" rx="4" fill="var(--surface)"/>
         <text class="dg-t" x="16" y="195" fill="var(--ink)" font-weight="650">沿制度回流</text>
         <text class="dg-s" x="16" y="216" fill="var(--ink-3)">正式机构确认落差后，此前不参与讨论的主体必须回应</text>
-        <rect x="240" y="192" width="300" height="12" rx="6" fill="var(--surface-3)"/>
-        <rect x="240" y="192" width="300" height="12" rx="6" fill="var(--danger)"/>
+        <rect x="320" y="192" width="260" height="12" rx="6" fill="var(--surface-3)"/>
+        <rect x="320" y="192" width="260" height="12" rx="6" fill="var(--danger)"/>
         <text class="dg-s" x="600" y="204" fill="var(--ink-2)">定义权与解释权的正式基础</text>
 
         <text class="dg-s" x="0" y="254" fill="var(--ink-3)">反噬的力量不来自追究者的数量，而来自结论的可引用性 —— 只要存在一份可以被反复引用的对照，任何一个后来者都能自行完成判断。</text>
@@ -2112,7 +2115,7 @@ body.srch-on .rail-tree{ display:none; }
       is licensed under <a data-tip="cc-by-nc-sa" aria-label="CC BY-NC-SA 4.0 授权协议（署名 · 非商业性使用 · 相同方式共享）" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a><span class="sep">·</span>仅用于学习交流</p>
     <p style="margin-top:12px;font-size:calc(12.5px*var(--fs-scale))">依据《解释权 · 定义权 · 话语权——社会认知秩序中的定义、解释与传播》整理</p>
     <p style="margin-top:10px;font-family:var(--mono);font-size:calc(11px*var(--fs-scale));color:var(--ink-4);letter-spacing:.08em"
-       title="如果你反馈的问题在最新版仍然存在，请把这个版本号一起发给维护者">页面版本 v2026.10.05-r3<span class="sep">·</span>看到旧版表现时请强制刷新（Ctrl+F5）</p>
+       title="如果你反馈的问题在最新版仍然存在，请把这个版本号一起发给维护者">页面版本 v2026.10.05-r4<span class="sep">·</span>看到旧版表现时请强制刷新（Ctrl+F5）</p>
   </div>
 </footer>
 
