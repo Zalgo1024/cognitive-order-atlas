@@ -237,6 +237,64 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
 .fold-in .fi h5{ font-size:calc(13px*var(--fs-scale)); font-weight:650; margin-bottom:6px; color:var(--ink); }
 .fold-in .fi p{ font-size:calc(12.8px*var(--fs-scale)); color:var(--ink-2); line-height:1.8; }
 
+/* ---------- Hero · 理论标题区（2026-10-05 第十七轮，仿用户提供的参考样式） ----------
+   结构：英文眉题 + 三色分词大标题 + 双行副标题 + 向下引导。
+   三色与全站语义码一致：解释权=exp琥珀 · 定义权=def靛 · 话语权=dis青。
+   注意：hero 元素不带 .rv（不参与滚动淡入），其入场用纯 CSS 一次性动画，避免
+   "rv + 状态 class 双重身份"再次踩雷（第十六轮教训）。 */
+.hero{
+  min-height:calc(88vh - var(--topbar));
+  display:flex; align-items:center;
+  padding:calc(var(--topbar) + 30px) 0 40px;
+}
+.hero .wrap{ text-align:center; }
+.hero-kicker{
+  font-family:var(--mono); font-size:calc(12.5px*var(--fs-scale));
+  letter-spacing:.34em; text-transform:uppercase; color:var(--ink-4);
+  margin-bottom:26px; text-indent:.34em;   /* 抵消最后一字符的字距，保证视觉居中 */
+}
+.hero-title{
+  font-size:clamp(calc(30px*var(--fs-scale)), 5.2vw, calc(54px*var(--fs-scale)));
+  font-weight:800; line-height:1.28; letter-spacing:.02em; color:var(--ink);
+  margin-bottom:22px;
+}
+.hero-title .tw{ white-space:nowrap; }
+.hero-title .c-def{ color:var(--def); }
+.hero-title .c-exp{ color:var(--exp); }
+.hero-title .c-dis{ color:var(--dis); }
+.hero-title .dot{ color:var(--ink-4); font-weight:400; margin:0 .18em; }
+.hero-sub{
+  font-size:clamp(calc(15px*var(--fs-scale)), 1.7vw, calc(18px*var(--fs-scale)));
+  color:var(--ink-2); line-height:1.9; margin-bottom:10px;
+}
+.hero-tag{
+  font-size:calc(13.5px*var(--fs-scale)); color:var(--ink-3); line-height:1.9;
+  margin-bottom:38px;
+}
+.hero-cta{
+  display:inline-flex; align-items:center; gap:9px;
+  padding:11px 26px; border:1px solid var(--line-hi); border-radius:999px;
+  font-size:calc(13.5px*var(--fs-scale)); color:var(--ink-2);
+  transition:border-color .25s, color .25s, background .25s;
+}
+.hero-cta:hover{ border-color:var(--def); color:var(--def); background:var(--def-w); }
+.hero-cta .ar{ font-family:var(--mono); transition:transform .25s; }
+.hero-cta:hover .ar{ transform:translateY(2px); }
+.hero-meta{ margin-top:16px; font-family:var(--mono); font-size:calc(11.5px*var(--fs-scale)); color:var(--ink-4); letter-spacing:.08em; }
+/* 入场：一次性 CSS 动画，无 JS 参与 */
+@keyframes heroIn{ from{ opacity:0; transform:translateY(16px); } to{ opacity:1; transform:none; } }
+.hero .wrap > *{ animation:heroIn .7s cubic-bezier(.22,.7,.3,1) backwards; }
+.hero .wrap > *:nth-child(1){ animation-delay:.05s; }
+.hero .wrap > *:nth-child(2){ animation-delay:.14s; }
+.hero .wrap > *:nth-child(3){ animation-delay:.23s; }
+.hero .wrap > *:nth-child(4){ animation-delay:.32s; }
+.hero .wrap > *:nth-child(5){ animation-delay:.41s; }
+@media (prefers-reduced-motion:reduce){ .hero .wrap > *{ animation:none !important; } }
+@media (max-width:760px){
+  .hero{ min-height:calc(72vh - var(--topbar)); }
+  .hero-title .dot{ margin:0 .1em; }
+}
+
 /* ---------- 交互块外壳 ---------- */
 .ix{
   margin:30px 0; border:1px solid var(--line); border-radius:4px; overflow:hidden;
@@ -1009,6 +1067,10 @@ body.srch-on .rail-tree{ display:none; }
   .main{ margin-left:0 !important; }
   .wrap{ max-width:100% !important; padding:0 !important; }
   .rv{ opacity:1 !important; transform:none !important; }
+  /* hero 作为"扉页"保留标题，但去掉视口高度与入场动画 */
+  .hero{ min-height:0 !important; padding:24pt 0 6pt !important; }
+  .hero .wrap > *{ animation:none !important; }
+  .hero-cta{ display:none !important; }
   .fold{ grid-template-rows:1fr !important; opacity:1 !important; }
   /* padding 已改为挂在 .on 上，打印时强制补回，否则内容会贴住标题 */
   .fold > .fold-in{ overflow:visible !important; padding:20px 2px 4px !important; }
@@ -1150,6 +1212,18 @@ body.srch-on .rail-tree{ display:none; }
 </div>
 
 <main class="main">
+
+<!-- ================= Hero · 理论标题区 ================= -->
+<section class="hero" aria-label="理论标题">
+  <div class="wrap">
+    <div class="hero-kicker">Definition · Interpretation · Discourse</div>
+    <h1 class="hero-title"><span class="tw c-exp">解释权</span><span class="dot">·</span><span class="tw c-def">定义权</span><span class="dot">·</span><span class="tw c-dis">话语权</span></h1>
+    <p class="hero-sub">社会认知秩序中的定义、解释与传播 —— 三权理论</p>
+    <p class="hero-tag">谁在命名，谁在定论，谁在传播。看清这三件事，判断才有落点。</p>
+    <a class="hero-cta" href="#c0"><span>从导论开始</span><span class="ar">↓</span></a>
+    <div class="hero-meta">13 章 · 8 个案例 · 17 个可展开讨论 · 阅读约 90 分钟</div>
+  </div>
+</section>
 
 <!-- ================= 00 · 导论 ================= -->
 <section class="chap" id="c0" data-c="0" data-title="导论 · 社会认知秩序">
@@ -2116,7 +2190,7 @@ body.srch-on .rail-tree{ display:none; }
       is licensed under <a data-tip="cc-by-nc-sa" aria-label="CC BY-NC-SA 4.0 授权协议（署名 · 非商业性使用 · 相同方式共享）" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a><span class="sep">·</span>仅用于学习交流</p>
     <p style="margin-top:12px;font-size:calc(12.5px*var(--fs-scale))">依据《解释权 · 定义权 · 话语权——社会认知秩序中的定义、解释与传播》整理</p>
     <p style="margin-top:10px;font-family:var(--mono);font-size:calc(11px*var(--fs-scale));color:var(--ink-4);letter-spacing:.08em"
-       title="如果你反馈的问题在最新版仍然存在，请把这个版本号一起发给维护者">页面版本 v2026.10.05-r5<span class="sep">·</span>看到旧版表现时请强制刷新（Ctrl+F5）</p>
+       title="如果你反馈的问题在最新版仍然存在，请把这个版本号一起发给维护者">页面版本 v2026.10.05-r6<span class="sep">·</span>看到旧版表现时请强制刷新（Ctrl+F5）</p>
   </div>
 </footer>
 
@@ -4982,7 +5056,8 @@ function markTerms(){
   var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
     acceptNode: function(node){
       if (SKIP[node.parentNode.nodeName]) return NodeFilter.FILTER_REJECT;
-      if (node.parentNode.closest && node.parentNode.closest('.term-pop,.rail,.srch,.srch-res')) return NodeFilter.FILTER_REJECT;
+      /* .hero 也要跳过：标题三色是设计主体，被 .term 包一层会连颜色带虚线全部污染 */
+      if (node.parentNode.closest && node.parentNode.closest('.term-pop,.rail,.srch,.srch-res,.hero')) return NodeFilter.FILTER_REJECT;
       var v = node.nodeValue;
       if (!v || v.length > 80) return NodeFilter.FILTER_REJECT;
       return NodeFilter.FILTER_ACCEPT;
