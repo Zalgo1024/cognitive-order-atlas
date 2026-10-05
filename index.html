@@ -217,7 +217,8 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
   font-size:calc(13px*var(--fs-scale)); color:var(--ink-3); transition:.25s; text-align:left;
 }.fold-t:hover{ background:var(--surface); color:var(--ink-2); }
 .fold-t .cx{ font-family:var(--mono); font-size:calc(15px*var(--fs-scale)); transition:transform .3s; }
-.fold-t.on .cx{ transform:rotate(45deg); }
+/* 开合态是 .fold-open（专属），不是 .on —— .on 属于 .rv 淡入态，两者绝不能混用 */
+.fold-t.fold-open .cx{ transform:rotate(45deg); }
 .fold{ display:grid; grid-template-rows:0fr; opacity:0;
   transition:grid-template-rows .45s cubic-bezier(.3,.8,.3,1), opacity .3s; }
 .fold.on{ grid-template-rows:1fr; opacity:1; }
@@ -2115,7 +2116,7 @@ body.srch-on .rail-tree{ display:none; }
       is licensed under <a data-tip="cc-by-nc-sa" aria-label="CC BY-NC-SA 4.0 授权协议（署名 · 非商业性使用 · 相同方式共享）" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a><span class="sep">·</span>仅用于学习交流</p>
     <p style="margin-top:12px;font-size:calc(12.5px*var(--fs-scale))">依据《解释权 · 定义权 · 话语权——社会认知秩序中的定义、解释与传播》整理</p>
     <p style="margin-top:10px;font-family:var(--mono);font-size:calc(11px*var(--fs-scale));color:var(--ink-4);letter-spacing:.08em"
-       title="如果你反馈的问题在最新版仍然存在，请把这个版本号一起发给维护者">页面版本 v2026.10.05-r4<span class="sep">·</span>看到旧版表现时请强制刷新（Ctrl+F5）</p>
+       title="如果你反馈的问题在最新版仍然存在，请把这个版本号一起发给维护者">页面版本 v2026.10.05-r5<span class="sep">·</span>看到旧版表现时请强制刷新（Ctrl+F5）</p>
   </div>
 </footer>
 
@@ -2195,9 +2196,13 @@ function toggleFold(btn){
   var body = btn.nextElementSibling;
   if (!body || !body.classList.contains('fold')) return;
   var open = body.classList.toggle('on');
-  btn.classList.toggle('on', open);
-  /* 文案与符号同步：展开时"展开 · xxx"会误导读者（内容已可见却还在说"展开"），
-     这是用户 2026-10-05 报的"点了之后看不到了"里最容易被误读成 bug 的一环。
+  /* 开合态用专属 class，绝不能动 `.rv.on` —— 按钮同时是 .rv（淡入），
+     旧版把两者共用一个 `on`：收起时 toggle('on', false) 会把 observer 加的
+     淡入态一并拔掉 → 按钮 opacity:0 + pointer-events:none →
+     按钮隐形且永远点不到（用户报的"展开后再点就整个消失、一次性使用"就是它）。 */
+  btn.classList.toggle('fold-open', open);
+  btn.setAttribute('aria-expanded', String(open));
+  /* 文案与符号同步：展开时"展开 · xxx"会误导读者（内容已可见却还在说"展开"）。
      存原始标题在 data-t 上，只替换前缀，不丢副标题。 */
   var lab = btn.querySelector('span:first-child');
   if (lab){
