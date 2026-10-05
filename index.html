@@ -215,15 +215,23 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
   display:flex; align-items:center; justify-content:space-between; gap:14px; width:100%;
   margin:22px 0 0; padding:14px 20px; border:1px dashed var(--line-hi); border-radius:4px;
   font-size:calc(13px*var(--fs-scale)); color:var(--ink-3); transition:.25s; text-align:left;
-}
-.fold-t:hover{ background:var(--surface); color:var(--ink-2); }
+}.fold-t:hover{ background:var(--surface); color:var(--ink-2); }
 .fold-t .cx{ font-family:var(--mono); font-size:calc(15px*var(--fs-scale)); transition:transform .3s; }
 .fold-t.on .cx{ transform:rotate(45deg); }
 .fold{ display:grid; grid-template-rows:0fr; opacity:0;
   transition:grid-template-rows .45s cubic-bezier(.3,.8,.3,1), opacity .3s; }
 .fold.on{ grid-template-rows:1fr; opacity:1; }
-.fold > .fold-in{ overflow:hidden; min-height:0; }
-.fold-in{ padding:20px 2px 4px; display:grid; gap:13px; }
+/* 折叠体。padding 必须随开合切换 —— 这是"收起后仍有空白"的唯一根因：
+   0fr 能压住内容高度，但压不住 .fold-in 自身的 padding（实测会残留 24px）。
+   不要加 height:0 —— 那会把 grid 容器锁死，.on 的 height:auto 覆盖不了，
+   表现为"点了没反应"（实测 rows 恒为 24px、opacity 仍 0）。
+   收起态的正确判据是 clientHeight === 0。 */
+.fold{ display:grid; grid-template-rows:0fr; opacity:0;
+  transition:grid-template-rows .45s cubic-bezier(.3,.8,.3,1), opacity .3s; }
+.fold.on{ grid-template-rows:1fr; opacity:1; }
+.fold > .fold-in{ overflow:hidden; min-height:0; padding:0; }
+.fold.on > .fold-in{ padding:20px 2px 4px; }
+.fold-in{ display:grid; gap:13px; }
 .fold-in .fi{ padding:15px 18px; border-left:2px solid var(--line-hi); background:var(--surface); border-radius:0 3px 3px 0; }
 .fold-in .fi h5{ font-size:calc(13px*var(--fs-scale)); font-weight:650; margin-bottom:6px; color:var(--ink); }
 .fold-in .fi p{ font-size:calc(12.8px*var(--fs-scale)); color:var(--ink-2); line-height:1.8; }
@@ -277,11 +285,14 @@ button{ font:inherit; color:inherit; background:none; border:none; cursor:pointe
 .st-sw:hover{ border-color:var(--line-hi); }
 .st-sw.on{ border-color:var(--c); background:var(--c-w); }
 .st-sw .r1{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:7px; }
-.st-sw .nm{ font-size:calc(14.5px*var(--fs-scale)); font-weight:650; color:var(--ink-3); transition:.25s; }
+.st-sw .nm{ font-size:calc(14.5px*var(--fs-scale)); font-weight:650; color:var(--ink-3); transition:.25s; min-width:0; }
 .st-sw.on .nm{ color:var(--c); }
+/* 徽章：短标签（01 / 02 / 03）用圆形，长文案（有 / 无）自动放宽为pill，避免文字溢出压住标题 */
 .st-sw .led{
-  width:24px; height:24px; border-radius:50%; border:1px solid var(--line-hi); flex:0 0 auto;
-  display:grid; place-items:center; font-family:var(--mono); font-size:calc(11.5px*var(--fs-scale)); color:var(--ink-4); transition:.28s;
+  min-width:24px; height:24px; padding:0 7px; border-radius:12px;
+  border:1px solid var(--line-hi); flex:0 0 auto; white-space:nowrap;
+  display:grid; place-items:center; font-family:var(--mono);
+  font-size:calc(11.5px*var(--fs-scale)); line-height:1; color:var(--ink-4); transition:.28s;
 }
 .st-sw.on .led{ border-color:var(--c); background:var(--c); color:var(--node-ink); }
 .st-sw .q{ font-size:calc(12.5px*var(--fs-scale)); color:var(--ink-3); line-height:1.55; }
@@ -447,8 +458,11 @@ canvas#atlas{ display:block; width:100%; height:auto; cursor:pointer; touch-acti
 .foot a[data-tip]:focus-visible{ outline:2px solid var(--def); outline-offset:2px; border-radius:2px; }
 
 /* ---------- 滚动显现 ---------- */
-.rv{ opacity:0; transform:translateY(18px); transition:opacity .65s cubic-bezier(.22,.7,.3,1), transform .65s cubic-bezier(.22,.7,.3,1); }
-.rv.on{ opacity:1; transform:none; }
+/* rv = 滚动进入视口时淡入。pointer-events:none 保证「还没淡入的元素」不可点 ——
+   opacity:0 仍然能接收点击，会造成"点了没反应"的假故障（折叠按钮首当其冲）。 */
+.rv{ opacity:0; transform:translateY(18px); pointer-events:none;
+  transition:opacity .65s cubic-bezier(.22,.7,.3,1), transform .65s cubic-bezier(.22,.7,.3,1); }
+.rv.on{ opacity:1; transform:none; pointer-events:auto; }
 
 /* ============================================================
    新增交互组件样式（c05–c11）
@@ -978,7 +992,8 @@ body.srch-on .rail-tree{ display:none; }
 
 @media (prefers-reduced-motion:reduce){
   *{ animation-duration:.01ms !important; transition-duration:.01ms !important; scroll-behavior:auto !important; }
-  .rv{ opacity:1; transform:none; }
+  /* pointer-events:auto 必须给：.rv 默认 none（防未淡入元素被点），只恢复 opacity 会全站点不可点 */
+  .rv{ opacity:1; transform:none; pointer-events:auto; }
 }
 
 /* ---------- 打印：展开全部内容，隐藏导航与交互控件 ---------- */
@@ -991,7 +1006,8 @@ body.srch-on .rail-tree{ display:none; }
   .wrap{ max-width:100% !important; padding:0 !important; }
   .rv{ opacity:1 !important; transform:none !important; }
   .fold{ grid-template-rows:1fr !important; opacity:1 !important; }
-  .fold > .fold-in{ overflow:visible !important; }
+  /* padding 已改为挂在 .on 上，打印时强制补回，否则内容会贴住标题 */
+  .fold > .fold-in{ overflow:visible !important; padding:20px 2px 4px !important; }
   .chap{ padding:18pt 0 !important; border-bottom:1px solid #ddd; break-inside:auto; }
   .chead,.prose h3,.fi h5{ break-after:avoid; }
   .ix,.cl-d,.case-v,.pull,.cards,figure{ break-inside:avoid; box-shadow:none !important; }
@@ -2175,6 +2191,17 @@ function toggleFold(btn){
   if (!body || !body.classList.contains('fold')) return;
   var open = body.classList.toggle('on');
   btn.classList.toggle('on', open);
+  /* 文案与符号同步：展开时"展开 · xxx"会误导读者（内容已可见却还在说"展开"），
+     这是用户 2026-10-05 报的"点了之后看不到了"里最容易被误读成 bug 的一环。
+     存原始标题在 data-t 上，只替换前缀，不丢副标题。 */
+  var lab = btn.querySelector('span:first-child');
+  if (lab){
+    if (!lab.dataset.t) lab.dataset.t = lab.textContent;
+    var orig = lab.dataset.t;
+    lab.textContent = open
+      ? orig.replace(/^展开\s*·\s*/, '收起 · ')
+      : (orig.indexOf('收起 · ') === 0 ? orig.replace(/^收起\s*·\s*/, '展开 · ') : orig);
+  }
 }
 
 /* ---------------- 滚动导航 ---------------- */
@@ -4233,6 +4260,8 @@ function mountAll(){
 var atlas = document.getElementById('atlas');
 var actx = atlas ? atlas.getContext('2d') : null;
 var LOGIC_W = 960, LOGIC_H = 700;     /* 画布逻辑坐标，绘制一律按此书写 */
+/* 当前展开的维度节点 —— 标签避让时必须避开它，否则会被推到中心盖住维度名 */
+var blockNode = null;
 var placed = [];                       /* 本轮已放置的标签框，用于碰撞回退 */
 var F_SANS = '-apple-system,"PingFang SC","Noto Sans SC",sans-serif';
 var F_MONO = 'ui-monospace,Consolas,monospace';
@@ -4357,34 +4386,61 @@ function qPoint(p0, c, p1, t){
   var mt = 1 - t;
   return { x: mt*mt*p0.x + 2*mt*t*c.x + t*t*p1.x, y: mt*mt*p0.y + 2*mt*t*c.y + t*t*p1.y };
 }
-/* 标签浮片。传了 rayA（射线方向）时，重叠兜底只沿这条射线外推 ——
-   永远不改变标签相对自己圆点的方位。旧版按"在中心点上方/下方"上下推 20px，
-   会把标签推到圆点的另一侧，并打乱相邻标签的上下次序。 */
+/* 标签浮片。传了 rayA（射线方向）时，重叠兜底按"沿射线外推 + 沿法线侧移"的组合
+   逐档试探，取第一个同时满足三个约束的档位（不越界 / 不撞已放置标签 / 不压住主节点圆）。
+   两版教训：① 旧版按"在中心点上方/下方"上下推 20px，会把标签推到锚点另一侧并打乱次序；
+   ② 改成"标签落回锚点、不再外推 26px"后，只剩沿射线外推 18/36 两档不够用 ——
+   def 维度弦距 71px < 标签宽 74px，必须允许侧向错开。返回标签实际落点供调用方连线。 */
 function plate(ctx, x, y, text, color, align, rayA){
   ctx.save();
   ctx.font = fpx(13, F_SANS);
   var w = ctx.measureText(text).width + 22, h = 28;
   function rect(cx, cy){
-    var lx2 = (align === 'center') ? cx - w / 2 : cx;
+    /* 三种对齐：left = 浮片左缘贴锚点（锚点在右侧）；right = 右缘贴锚点（锚点在左侧）。
+       旧版只判center / else，两种方向都会退化成 left，标签就会整体偏出锚点。 */
+    var lx2 = (align === 'right') ? cx - w : ((align === 'center') ? cx - w / 2 : cx);
     if (lx2 < 6) lx2 = 6;
     if (lx2 + w > LOGIC_W - 6) lx2 = LOGIC_W - 6 - w;
     return { x: lx2 + w / 2, y: cy, w: w, h: h, lx: lx2 };
   }
-  function hit(r){
+  function fits(r){
+    /* 三个约束同时成立才算可用：① 不越画布边界 ② 不撞已放置标签
+       ③ **不压住主节点圆**（否则标签被避让推到中心，正好盖住维度名） */
+    if (r.y - h / 2 < 6 || r.y + h / 2 > LOGIC_H - 6) return false;
     for (var m = 0; m < placed.length; m++){
       var p = placed[m];
       if (Math.abs(r.x - p.x) < (r.w + p.w) / 2 - 3 &&
-          Math.abs(r.y - p.y) < (r.h + p.h) / 2 - 2) return true;
+          Math.abs(r.y - p.y) < (r.h + p.h) / 2 - 2) return false;
     }
-    return false;
+    if (typeof blockNode !== 'undefined' && blockNode){
+      /* 标签矩形 vs 主节点圆：取矩形上离圆心最近的点，判定是否落在圆内 */
+      var bx = blockNode.x < r.x - r.w / 2 ? r.x - r.w / 2
+              : (blockNode.x > r.x + r.w / 2 ? r.x + r.w / 2 : blockNode.x);
+      var by = blockNode.y < r.y - r.h / 2 ? r.y - r.h / 2
+              : (blockNode.y > r.y + r.h / 2 ? r.y + r.h / 2 : blockNode.y);
+      var ddx = blockNode.x - bx, ddy = blockNode.y - by;
+      if (ddx * ddx + ddy * ddy < (blockNode.r + 6) * (blockNode.r + 6)) return false;
+    }
+    return true;
   }
   var box = rect(x, y);
-  if (rayA != null && hit(box)){
-    /* 沿射线再外推 18 / 36px，只接受既不越界、也不与已放置标签相撞的档位；
-       两档都不行就保持原位（几何已验证留有余量，正常不会走到这里） */
-    for (var k = 1; k <= 2; k++){
-      var cand = rect(x + Math.cos(rayA) * 18 * k, y + Math.sin(rayA) * 18 * k);
-      if (cand.y - h / 2 >= 6 && cand.y + h / 2 <= LOGIC_H - 6 && !hit(cand)){ box = cand; break; }
+  if (rayA != null && !fits(box)){
+    /* 标签去掉了小球后不再外推 26px，密集扇形里（def 弦距 71px < 标签宽 74px）
+       相邻标签必然相撞。这里按"沿射线 → 加侧向偏移"的组合逐档试探，
+       取第一个既不越界、也不与已放置标签相撞的档位；
+       旧版只试 18/36 两档纯外推，dis维度（标签宽 87px）两档都不够用。 */
+    var CA = Math.cos(rayA), SA = Math.sin(rayA);
+    var NX = -SA, NY = CA;               /* 射线法线，用于侧向错开 */
+    var ALONG = [16, 30, 44, 58, 72, 86, 100];
+    var SIDE  = [0, 17, -17, 34, -34];
+    outer:
+    for (var s = 0; s < SIDE.length; s++){
+      for (var k = 0; k < ALONG.length; k++){
+        var cx2 = x + CA * ALONG[k] + NX * SIDE[s];
+        var cy2 = y + SA * ALONG[k] + NY * SIDE[s];
+        var cand = rect(cx2, cy2);
+        if (fits(cand)){ box = cand; break outer; }
+      }
     }
   }
   placed.push({ x: box.x, y: box.y, w: box.w, h: box.h });
@@ -4397,6 +4453,7 @@ function plate(ctx, x, y, text, color, align, rayA){
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText(text, box.lx + w / 2, box.y);
   ctx.restore();
+  return { x: box.lx + w / 2, y: box.y, w: w, h: h };   /* 供调用方补连线 */
 }
 function node(ctx, x, y, r, color, label, isHover){
   if (isHover) glow(ctx, x, y, r + 20, color, 0.3);
@@ -4413,19 +4470,31 @@ function node(ctx, x, y, r, color, label, isHover){
   ctx.fillText(label, x, y + 1);
   ctx.restore();
 }
+/* 三级节点：**不再画小球**（用户 2026-10-05 要求），只留一个极小的落笔点+ 文字浮片。
+   原来这里画一个 r=7 的圆点 + 阴影，文字被推到圆外 26px，结果是一堆小圆点悬在半空、
+   连线终点没有视觉锚，读起来像散落的珠子。现在锚点保留（连线仍终止于 subPos），
+   但半径缩到 3，标签由 plate 自行避让后落在锚点附近，并补一条锚点→标签的短线，
+   保证"线指到字"的关系始终成立。返回标签实际落点，供绘制循环连线。 */
 function subNode(ctx, x, y, color, label, isHover, rayA){
-  if (isHover) glow(ctx, x, y, 22, color, 0.34);
+  if (isHover) glow(ctx, x, y, 18, color, 0.34);
   ctx.save();
-  ctx.shadowColor = rgba(color, isHover ? 0.8 : 0.35);
-  ctx.shadowBlur = isHover ? 18 : 8;
+  ctx.shadowColor = rgba(color, isHover ? 0.7 : 0.28);
+  ctx.shadowBlur = isHover ? 12 : 5;
   ctx.fillStyle = color;
-  ctx.beginPath(); ctx.arc(x, y, isHover ? 9 : 7, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x, y, isHover ? 5 : 3, 0, Math.PI * 2); ctx.fill();
   ctx.restore();
-  /* 标签沿自己那条射线外移固定 26px：恒贴着自己的圆点，方位也永远一致。
-     用 subPos 返回的 a（而不是从坐标反推）是因为动画中 p→0 时圆点会收缩到节点中心，
-     反推会得到零向量。 */
-  plate(ctx, x + Math.cos(rayA) * 26, y + Math.sin(rayA) * 26,
-        label, isHover ? color : PAL.ink2, 'center', rayA);
+  /* 标签直接交给 plate：它会先试原位，撞了就沿射线+法线逐档避让。 */
+  var p = plate(ctx, x, y, label, isHover ? color : PAL.ink2, 'center', rayA);
+  /* 锚点 → 标签落点的细线，让被避让推开的标签仍然有明确的归属 */
+  if (p && (Math.abs(p.x - x) > 2 || Math.abs(p.y - y) > 2)){
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    ctx.strokeStyle = rgba(color, 0.9);
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(p.x, p.y); ctx.stroke();
+    ctx.restore();
+  }
+  return p;
 }
 
 function drawAtlas(){
@@ -4497,6 +4566,7 @@ function drawAtlas(){
   }
 
   var activeDim = expandedDim ? dimById(expandedDim) : null;
+  blockNode = (activeDim && animP > 0) ? activeDim : null;   /* 标签不许压住它 */
   if (activeDim && animP > 0){
     var dc = dimColor(activeDim);
     for (var s = 0; s < activeDim.subs.length; s++){
@@ -4960,13 +5030,13 @@ function initNoAnim(){
   if (!on) return;
   document.documentElement.setAttribute('data-noanim', '1');
   var st = document.createElement('style');
-  st.textContent = '.rv{opacity:1 !important;transform:none !important}';
+  /* pointer-events:auto 必须一起写：.rv 默认 pointer-events:none（防止未淡入的元素被点到），
+     只写 opacity:1 会让 noanim 模式下全站点不动。 */
+  st.textContent = '.rv{opacity:1 !important;transform:none !important;pointer-events:auto !important}';
   document.head.appendChild(st);
-  /* 把所有折叠区默认展开，便于通读与打印 */
-  var folds = document.querySelectorAll('.fold');
-  for (var i = 0; i < folds.length; i++) folds[i].classList.add('on');
+  /* 把所有折叠区默认展开，便于通读与打印。走 toggleFold 以同步文案（否则仍显示"展开 ·"） */
   var ts = document.querySelectorAll('.fold-t');
-  for (var j = 0; j < ts.length; j++){ ts[j].classList.add('on'); }
+  for (var j = 0; j < ts.length; j++){ toggleFold(ts[j]); }
 }
 
 /* ============================================================
